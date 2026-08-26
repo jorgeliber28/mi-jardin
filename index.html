@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Mi Jardín - Guía de Plantas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --zona1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --zona2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --zona3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --zona4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --zona5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            padding: 15px 10px;
+            background: white;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            color: white;
+            border: 2px solid transparent;
+        }
+
+        .tab-btn.zona1 { background: var(--zona1); }
+        .tab-btn.zona2 { background: var(--zona2); }
+        .tab-btn.zona3 { background: var(--zona3); }
+        .tab-btn.zona4 { background: var(--zona4); }
+        .tab-btn.zona5 { background: var(--zona5); }
+
+        .tab-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            padding: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+            padding-bottom: 40px;
+        }
+
+        .zone-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            color: white;
+            display: none;
+        }
+
+        .zone-title.active { display: block; }
+
+        .plant-card {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 5px solid #667eea;
+        }
+
+        .plant-card.z1 { border-left-color: #667eea; }
+        .plant-card.z2 { border-left-color: #f5576c; }
+        .plant-card.z3 { border-left-color: #00f2fe; }
+        .plant-card.z4 { border-left-color: #43e97b; }
+        .plant-card.z5 { border-left-color: #fa709a; }
+
+        .plant-header {
+            padding: 15px;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .plant-header:active {
+            background: #f9f9f9;
+        }
+
+        .plant-icon {
+            font-size: 2.5em;
+            flex-shrink: 0;
+        }
+
+        .photo-wrap {
+            width: 84px;
+            height: 84px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .photo-wrap .fallback {
+            font-size: 2.2em;
+            line-height: 1;
+        }
+
+        .photo-wrap {
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .photo-wrap .lupa {
+            position: absolute;
+            right: 3px;
+            bottom: 3px;
+            font-size: 0.72em;
+            background: rgba(255,255,255,.92);
+            border-radius: 50%;
+            width: 19px;
+            height: 19px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,.25);
+        }
+
+        .photo-wrap:active {
+            transform: scale(.94);
+        }
+
+        .btn-fotos {
+            display: inline-block;
+            font-size: 0.7em;
+            font-weight: 600;
+            color: #1a73e8;
+            background: #e8f0fe;
+            border-radius: 999px;
+            padding: 4px 10px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-fotos:active {
+            background: #d2e3fc;
+        }
+
+        .plant-svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .plant-photo {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            opacity: 0;
+            transition: opacity .4s ease;
+        }
+
+        .plant-photo.loaded { opacity: 1; }
+
+        .plant-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .plant-name {
+            font-weight: 700;
+            font-size: 1.05em;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .plant-location {
+            font-size: 0.85em;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .plant-badges {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            font-size: 0.75em;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background: #f0f0f0;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .badge.water { background: #e3f2fd; color: #1976d2; }
+        .badge.light { background: #fff3e0; color: #f57c00; }
+        .badge.difficulty { background: #fce4ec; color: #c2185b; }
+
+        .toggle-icon {
+            font-size: 1.5em;
+            transition: transform 0.3s ease;
+            color: #999;
+        }
+
+        .plant-card.expanded .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .plant-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: #fafafa;
+        }
+
+        .plant-card.expanded .plant-details {
+            max-height: 3000px;
+        }
+
+        .detail-content {
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .detail-box {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+
+        .detail-box h4 {
+            font-size: 0.8em;
+            color: #667eea;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-box p, .detail-box ul {
+            font-size: 0.85em;
+            color: #555;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .detail-box ul {
+            margin-left: 16px;
+            padding: 0;
+        }
+
+        .detail-box li {
+            margin-bottom: 4px;
+        }
+
+        .detail-full {
+            grid-column: 1 / -1;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+            margin-top: 12px;
+        }
+
+        .success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .info-section {
+            display: none;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        .info-section.active {
+            display: block;
+        }
+
+        .legend {
+            background: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .legend h3 {
+            font-size: 0.95em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .legend-item {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .legend-item strong {
+            color: #333;
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .container {
+                padding: 8px;
+            }
+
+            .plant-card {
+                margin-bottom: 10px;
+            }
+
+            .detail-content {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px 15px;
+            color: #999;
+            font-size: 0.8em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌱 Mi Jardín</h1>
+        <p>Guía interactiva de plantas</p>
+    </div>
+
+    <div class="tabs" id="tabs"></div>
+
+    <div class="container">
+        <div class="legend">
+            <h3>💡 Cómo usar:</h3>
+            <div class="legend-item">✓ Selecciona una zona arriba</div>
+            <div class="legend-item">✓ Toca una planta para ver TODA la información</div>
+            <div class="legend-item">✓ Puedes consultar mientras riegas</div>
+        </div>
+
+        <div id="content"></div>
+    </div>
+
+    <div class="footer">
+        <p>📱 Optimizado para móvil | Consulta siempre que lo necesites</p>
+    </div>
+
+    <script>
+        const plantas = {
+            zona1: {
+                titulo: "ZONA 1: Luz Baja + Agua Moderada",
+                gradient: "var(--zona1)",
+                plantas: [
+                    {
+                        nombre: "Hoja de Hombre",
+                        cientifico: "Philodendron hederaceum",
+                        emoji: "🪴",
+                        ubicacion: "Rincón, pasillo",
+                        riego: "5-7 días",
+                        luz: "Baja",
+                        dificultad: "Muy Fácil",
+                        sustrato: "Tierra universal + perlita (40% tierra, 20% perlita, 40% musgo sphagnum)",
+                        humedad: "50-70%",
+                        temperatura: "18-25°C",
+                        poda: "Poda regularmente para mantener forma. Retira hojas amarillas. Puedes podar hasta el suelo - rebrota fácil.",
+                        reproduccion: "Esquejes en agua en primavera-verano. Enraíza en 3-4 semanas. Muy fácil.",
+                        nivelExigencia: "1/10 - Sobrevive en casi cualquier condición",
+                        problemas: "Hojas amarillas = exceso agua | Tallos secos = falta luz | Araña roja: rocía agua",
+                        especial: "Tóxica para mascotas. Gira cada 2 semanas. Soporta poca luz pero crece mejor con luz indirecta."
+                    },
+                    {
+                        nombre: "Anturio",
+                        cientifico: "Anthurium andraeanum",
+                        emoji: "🌺",
+                        ubicacion: "Rincón, interior",
+                        riego: "5-7 días",
+                        luz: "Baja-Media",
+                        dificultad: "Fácil",
+                        sustrato: "Sustrato para orquídeas (corteza de pino, musgo, carbón). Debe drenar MUY bien.",
+                        humedad: "60-80%",
+                        temperatura: "20-28°C",
+                        poda: "Retira flores marchitas desde la base. No podes tallos activamente. Elimina hojas viejas.",
+                        reproduccion: "Brotes laterales con raíces propias. Trasplanta en primavera.",
+                        nivelExigencia: "4/10 - Requiere humedad consistente",
+                        problemas: "Flores marrones = agua fría o plagas | Sin flores = falta luz/nutrientes | Hojas enrolladas = baja humedad",
+                        especial: "Florece 8+ meses/año. Flores duran semanas. Tóxica: usa guantes. Limpia hojas regularmente."
+                    },
+                    {
+                        nombre: "Diefembaquia Reflectante",
+                        cientifico: "Dieffenbachia 'Reflector'",
+                        emoji: "🌿",
+                        ubicacion: "Rincón, interior",
+                        riego: "5-7 días",
+                        luz: "Baja-Media",
+                        dificultad: "Fácil",
+                        sustrato: "Tierra universal + perlita. Buen drenaje. Renueva cada 1-2 años.",
+                        humedad: "50-70%",
+                        temperatura: "18-25°C",
+                        poda: "Poda regularmente para mantener compacta. Corta por encima de un nudo. Crece rápido - tolera podas fuertes.",
+                        reproduccion: "Esquejes de tallo enraízan en agua. Planta en tierra después de 2-3 semanas.",
+                        nivelExigencia: "2/10 - Muy tolerante",
+                        problemas: "Tallos largos = falta luz | Hojas pálidas = falta nutrientes | Pudrición raíz = exceso agua",
+                        especial: "⚠️ TÓXICA: Evita mascotas y niños. Lava manos. Crece rápido: poda regularmente para forma."
+                    }
+                ]
+            },
+            zona2: {
+                titulo: "ZONA 2: Luz Media + Agua Moderada",
+                gradient: "var(--zona2)",
+                plantas: [
+                    {
+                        nombre: "Poto Marble Queen",
+                        cientifico: "Epipremnum aureum 'Marble Queen'",
+                        emoji: "🪴",
+                        ubicacion: "Ventana N/E con cortina",
+                        riego: "5-7 días",
+                        luz: "Media",
+                        dificultad: "Muy Fácil",
+                        sustrato: "Tierra universal + perlita (50/50). Excelente drenaje.",
+                        humedad: "40-60%",
+                        temperatura: "18-25°C",
+                        poda: "Poda regularmente para ramificación. Alarga fácilmente - puedes cortar a cualquier nudo.",
+                        reproduccion: "Esquejes en agua. Enraíza rapidísimo (1-2 semanas).",
+                        nivelExigencia: "1/10 - Casi indestructible",
+                        problemas: "Variegación débil = falta luz | Tallos largos secos = exceso agua",
+                        especial: "Crece lentamente que potos verdes pero es más decorativa. Tóxica. Ideal para enredaderas."
+                    },
+                    {
+                        nombre: "Poto Neón",
+                        cientifico: "Epipremnum aureum 'Neon'",
+                        emoji: "💚",
+                        ubicacion: "Ventana con luz media-brillante",
+                        riego: "5-7 días",
+                        luz: "Media-Brillante",
+                        dificultad: "Fácil",
+                        sustrato: "Tierra universal + perlita. Necesita buen drenaje.",
+                        humedad: "40-60%",
+                        temperatura: "18-25°C",
+                        poda: "Poda frecuentemente para mantener forma. Tolera podas agresivas.",
+                        reproduccion: "Esquejes de 15 cm con 2-3 nudos en agua.",
+                        nivelExigencia: "2/10 - Fácil pero requiere más luz",
+                        problemas: "Color amarillento = falta luz | Crece lentamente = requiere más luz | Cochinillas: rocía agua jabonosa",
+                        especial: "Requiere más luz que otros potos para color brillante. Tóxica. Gira regularmente."
+                    },
+                    {
+                        nombre: "Potos Verde",
+                        cientifico: "Epipremnum aureum",
+                        emoji: "🪴",
+                        ubicacion: "Cualquier lugar interior",
+                        riego: "5-7 días",
+                        luz: "Baja-Media",
+                        dificultad: "Extremadamente Fácil",
+                        sustrato: "Tierra universal. La más tolerante. Crece en CUALQUIER sustrato.",
+                        humedad: "30-60%",
+                        temperatura: "15-28°C",
+                        poda: "Poda agresiva cada 2-3 meses para densidad. Tollera podas al ras.",
+                        reproduccion: "Esquejes en agua o tierra. Enraíza en 1-2 semanas. LA MÁS FÁCIL.",
+                        nivelExigencia: "0/10 - PLANTA MÁS RESISTENTE",
+                        problemas: "MUY POCOS. Crece en cualquier condición (casi).",
+                        especial: "LA PLANTA MÁS RESISTENTE. Ideal para principiantes. Cubre muros. Tóxica. Tolera abandono PROLONGADO."
+                    },
+                    {
+                        nombre: "Begonia Ala de Ángel",
+                        cientifico: "Begonia maculata",
+                        emoji: "🌿",
+                        ubicacion: "Ventana N/E, luz media",
+                        riego: "5-7 días",
+                        luz: "Media",
+                        dificultad: "Medio",
+                        sustrato: "Tierra + perlita + musgo (40/30/30). Debe drenar bien pero mantener humedad.",
+                        humedad: "60-70%",
+                        temperatura: "18-24°C",
+                        poda: "Poda después de floración. Elimina flores marchitas para más flores. Mantén forma compacta.",
+                        reproduccion: "Esquejes de tallo con 2-3 nudos en sustrato húmedo.",
+                        nivelExigencia: "5/10 - Requiere humedad y atención",
+                        problemas: "Manchas hojas = agua fría o splash | Botrytis = reduce humedad | Caída flores = cambio temperatura",
+                        especial: "Flores y follaje hermosos. Mantén sustrato uniformemente húmedo pero NO encharcado. Evita frío."
+                    },
+                    {
+                        nombre: "Philodendron Burle Marx",
+                        cientifico: "Philodendron 'Burle Marx'",
+                        emoji: "🪴",
+                        ubicacion: "Escritorio, mesa con luz media",
+                        riego: "5-7 días",
+                        luz: "Media",
+                        dificultad: "Fácil",
+                        sustrato: "Tierra + corteza pino + musgo (40/30/30). Simula hábitat tropical.",
+                        humedad: "50-70%",
+                        temperatura: "18-25°C",
+                        poda: "Poda moderada para densidad. Las raíces aéreas: déjalas o córtalas según prefieras.",
+                        reproduccion: "Esquejes con raíces aéreas enraízan fácilmente en sustrato o agua.",
+                        nivelExigencia: "3/10 - Compacta y tolerante",
+                        problemas: "Hojas pequeñas = falta luz/nutrientes | Raíces aéreas = normal | Amarillamiento = exceso agua",
+                        especial: "Forma compacta, ideal para mesas. Crece LENTAMENTE pero vale. Tóxica. Gira cada 2 semanas."
+                    },
+                    {
+                        nombre: "Monstera Deliciosa",
+                        cientifico: "Monstera deliciosa",
+                        emoji: "🍃",
+                        ubicacion: "Ventana con luz media-brillante",
+                        riego: "7-10 días",
+                        luz: "Media-Brillante",
+                        dificultad: "Fácil",
+                        sustrato: "Tierra + perlita + corteza (40/30/30). Necesita tutor o epipremio.",
+                        humedad: "50-70%",
+                        temperatura: "18-27°C",
+                        poda: "Poda para controlar tamaño. Corta por encima de un nudo para más brotes.",
+                        reproduccion: "Esquejes con nudo aéreo. Enraíza fácilmente en agua.",
+                        nivelExigencia: "3/10 - Crece bien con luz media",
+                        problemas: "Sin perforaciones = luz insuficiente | Tallos largos desnudos = falta luz | Hojas amarillas = exceso agua",
+                        especial: "CRECE GRANDE: espacio suficiente. Perforaciones llegan con madurez (2-3 años). Tóxica. Tutor recomendado. Puede trepar 2+ metros."
+                    }
+                ]
+            },
+            zona3: {
+                titulo: "ZONA 3: Luz Media/Alta + Agua Moderada",
+                gradient: "var(--zona3)",
+                plantas: [
+                    {
+                        nombre: "Areca",
+                        cientifico: "Dypsis lutescens",
+                        emoji: "🌴",
+                        ubicacion: "Ventana este brillante",
+                        riego: "7-10 días",
+                        luz: "Media-Alta",
+                        dificultad: "Medio-Alto",
+                        sustrato: "Tierra + perlita + carbón (50/30/20). Buen drenaje ESENCIAL. Palmeras necesitan aireación.",
+                        humedad: "50-70%",
+                        temperatura: "18-27°C",
+                        poda: "Solo retira frondas muertas/amarillas en la base. NO podes frondas verdes.",
+                        reproduccion: "Semillas (lentísimo) o retoños basales cuando grandes.",
+                        nivelExigencia: "6/10 - Tropical, requiere continuidad",
+                        problemas: "Puntas secas = baja humedad + sales acumuladas | Ácaros: rocía frecuente | Cochinillas: aceite neem",
+                        especial: "PLANTA TROPICAL: requiere continuidad cuidados. No tolera cambios. Crece LENTAMENTE. Tóxica. Puede 2m+."
+                    },
+                    {
+                        nombre: "Árbol del Caucho",
+                        cientifico: "Ficus elastica",
+                        emoji: "🌳",
+                        ubicacion: "Ventana con buena luz",
+                        riego: "7-10 días",
+                        luz: "Media-Alta (ama luz)",
+                        dificultad: "Fácil",
+                        sustrato: "Tierra universal + perlita (60/40). Drenaje muy bueno. Renueva cada 2 años.",
+                        humedad: "40-60%",
+                        temperatura: "18-28°C",
+                        poda: "Poda apical para ramificación. Corta por encima de una rama/nudo lateral.",
+                        reproduccion: "Esquejes de tallo en primavera. Usa hormona de enraizamiento. Enraíza 3-4 semanas.",
+                        nivelExigencia: "3/10 - Tolerante si tiene luz",
+                        problemas: "Caída hojas = cambio ubicación o frío | Cochinillas/escamas: insecticida | Hojas pálidas = falta luz",
+                        especial: "PLANTA GRANDE Y FRONDOSA: espacio (3m+). Ama luz brillante. Tóxica: látex irritante. Gira 1-2 semanas."
+                    }
+                ]
+            },
+            zona4: {
+                titulo: "ZONA 4: Luz Baja/Media + Agua Baja (BAJO MANTENIMIENTO)",
+                gradient: "var(--zona4)",
+                plantas: [
+                    {
+                        nombre: "Sansevieria",
+                        cientifico: "Sansevieria trifasciata",
+                        emoji: "📏",
+                        ubicacion: "Rincón, sin luz directa",
+                        riego: "10-14 días",
+                        luz: "Muy Baja (tolera oscuridad)",
+                        dificultad: "Extremadamente Fácil",
+                        sustrato: "Cactáceas + perlita (70/30). Drenaje MÁXIMO: requiere POCO agua.",
+                        humedad: "20-40%",
+                        temperatura: "15-30°C",
+                        poda: "Retira hojas dañadas en la base. Casi no necesita poda.",
+                        reproduccion: "Trozos de hoja en arena seca. Enraíza 4-6 semanas. También división de rizomas.",
+                        nivelExigencia: "0/10 - PERFECTA PARA PRINCIPIANTES",
+                        problemas: "Pudrición blanda = EXCESO AGUA (principal) | Tallos blandos = encharcamiento",
+                        especial: "✅ PERFECTA PARA PRINCIPIANTES Y APARTAMENTOS. Purifica aire (NASA). Tóxica si se ingiere. Crece lentamente. Invierno: casi NO riego. ¡OLVÍDALA!"
+                    },
+                    {
+                        nombre: "Cuerno de Alce",
+                        cientifico: "Platycerium bifurcatum",
+                        emoji: "🦌",
+                        ubicacion: "Pared en tabla de corcho",
+                        riego: "10-14 días (rocía)",
+                        luz: "Media (no sol directo)",
+                        dificultad: "Medio",
+                        sustrato: "Epífita: corteza pino + musgo sphagnum + carbón. Montaje en tabla corcho o madera.",
+                        humedad: "60-80%",
+                        temperatura: "15-25°C",
+                        poda: "NO podes frondas verdes. Retira hojas base muertas (son protectoras). Limpia polvo.",
+                        reproduccion: "Esporas (difícil) o división cuando tiene offsetos grandes.",
+                        nivelExigencia: "5/10 - Requiere humedad consistente",
+                        problemas: "Frondas secas = baja humedad | Base marrón = normal, protectora | Plagas raras",
+                        especial: "PLANTA DE COLECCIÓN. Requiere humedad CONSISTENTE. Crece en árboles (epífita). ESPECTACULAR en pared. Lento pero gratificante."
+                    },
+                    {
+                        nombre: "Planta del Corazón",
+                        cientifico: "Hoya kerrii",
+                        emoji: "💕",
+                        ubicacion: "Escritorio, estante",
+                        riego: "10-14 días",
+                        luz: "Baja-Media",
+                        dificultad: "Muy Fácil",
+                        sustrato: "Suculentas + perlita (60/40). Muy bien drenado. Maceta pequeña.",
+                        humedad: "30-50%",
+                        temperatura: "18-27°C",
+                        poda: "Mínima. Retira flores muertas. Tolera formas variadas - no necesita poda.",
+                        reproduccion: "Hoja entera en sustrato seco. Tarda MESES pero eventualmente forma plantita. PACIENCIA.",
+                        nivelExigencia: "1/10 - Casi no requiere atención",
+                        problemas: "No florece = falta luz o joven | Hojas amarillas = EXCESO agua (principal) | Lenta es normal",
+                        especial: "REGALO PERFECTO. Forma corazón adorable. Florece flores rosadas cuando madura (2-3 años). CRECE LENTAMENTE. Vive años con mínimo cuidado."
+                    },
+                    {
+                        nombre: "Nopalillo Mal Ojo",
+                        cientifico: "Rhipsalis baccifera",
+                        emoji: "🌿",
+                        ubicacion: "Colgante en ventana",
+                        riego: "10-14 días (rocía)",
+                        luz: "Media (tolera sombra)",
+                        dificultad: "Fácil",
+                        sustrato: "Tropical + perlita (60/40). Epífita: prefiere musgo.",
+                        humedad: "50-70%",
+                        temperatura: "15-25°C",
+                        poda: "Poda leve para ramificación. Corta segmentos dañados.",
+                        reproduccion: "Esquejes 5-10 cm enraízan fácilmente en sustrato húmedo. 2-3 semanas.",
+                        nivelExigencia: "2/10 - Cactus tropical fácil",
+                        problemas: "Brotes secos = baja humedad | Alargamiento = falta luz (tolera sombra) | Cochinillas: neem",
+                        especial: "CACTUS DIFERENTE: no es del desierto. Flores blancas/rosadas. Perfecta para colgante. CRECE RÁPIDO. Frutos rojos comestibles (mora tropical)."
+                    },
+                    {
+                        nombre: "Cactus Colgante",
+                        cientifico: "Rhipsalis baccifera subsp. horrida",
+                        emoji: "🌺",
+                        ubicacion: "Cesto colgante",
+                        riego: "10-14 días",
+                        luz: "Media-Baja",
+                        dificultad: "Fácil",
+                        sustrato: "Orquídeas + perlita. Epífita tropical. Maceta colgante ideal.",
+                        humedad: "50-70%",
+                        temperatura: "15-25°C",
+                        poda: "Poda suave para forma. Tolera recortes varios.",
+                        reproduccion: "Esquejes 2-3 segmentos enraízan agua o sustrato. MUY FÁCIL.",
+                        nivelExigencia: "2/10 - Muy tolerante",
+                        problemas: "Segmentos flácidos = baja humedad | Pudrición = agua en exceso | Crecimiento lento es normal",
+                        especial: "RARA Y ESPECIAL. Flores delicadas pequeñas. Frutos rosados decorativos. Ideal basket colgante. NO la dejes completamente seca."
+                    }
+                ]
+            },
+            zona5: {
+                titulo: "ZONA 5: Luz Alta + Agua Baja (SUCULENTAS Y SOL)",
+                gradient: "var(--zona5)",
+                plantas: [
+                    {
+                        nombre: "Palma de Madagascar",
+                        cientifico: "Pachypodium lamerei",
+                        emoji: "🌴",
+                        ubicacion: "Ventana sur/oeste",
+                        riego: "10-14 días",
+                        luz: "SOL DIRECTO",
+                        dificultad: "Medio-Alto",
+                        sustrato: "Cactáceas + arena gruesa (70/30). DRENAJE MÁXIMO. Maceta con agujeros GRANDES.",
+                        humedad: "20-30%",
+                        temperatura: "20-30°C",
+                        poda: "Retira hojas viejas. NO podes las ramas activamente.",
+                        reproduccion: "Semillas (muy lento) o esquejes tallo en arena seca. Requiere PACIENCIA.",
+                        nivelExigencia: "5/10 - Exige drenaje perfecto y sol",
+                        problemas: "Pudrición = 99% es por AGUA | Amarillamiento = exceso riego | Crece lento es NORMAL",
+                        especial: "⚠️ RARA TROPICAL. Espinas afiladas: ubicación segura. Crece LENTAMENTE (atractivo). Invierno: casi no riego. 1.5m+. Flores amarillas (raro interior)."
+                    },
+                    {
+                        nombre: "Cotyledon Pendens",
+                        cientifico: "Cotyledon pendens",
+                        emoji: "🌸",
+                        ubicacion: "Canasta colgante",
+                        riego: "10-14 días",
+                        luz: "SOL DIRECTO",
+                        dificultad: "Muy Fácil",
+                        sustrato: "Cactáceas + perlita (60/40). Maceta colgante con buen drenaje.",
+                        humedad: "10-30%",
+                        temperatura: "15-28°C",
+                        poda: "Retira flores secas. Minimiza poda, es natural y hermosa así.",
+                        reproduccion: "Hojas enteras sobre arena seca. Enraíza 2-3 semanas. MUY FÁCIL.",
+                        nivelExigencia: "1/10 - Suculenta resistente",
+                        problemas: "Hojas suaves = EXCESO agua | Baja luz pierde color dorado | Cochinillas: neem",
+                        especial: "HERMOSA EN CANASTA. Hojas carne dorada/naranja (con sol). Flores tubo rojo/naranja. CRECE RÁPIDO. Perfecta para olvidadiza. Tóxica."
+                    },
+                    {
+                        nombre: "Zebrina",
+                        cientifico: "Tradescantia zebrina",
+                        emoji: "🟣",
+                        ubicacion: "Ventana sur/oeste",
+                        riego: "7-10 días",
+                        luz: "Luz Brillante (sol suave)",
+                        dificultad: "Muy Fácil",
+                        sustrato: "Tierra + perlita (60/40). Crece rápido en cualquier sustrato.",
+                        humedad: "40-60%",
+                        temperatura: "15-28°C",
+                        poda: "Poda frecuentemente para densidad. Tolera podas agresivas. Ramifica fácilmente.",
+                        reproduccion: "Esquejes en agua. Enraíza en 5-7 días. MÁS FÁCIL IMPOSIBLE.",
+                        nivelExigencia: "1/10 - Muy resistente",
+                        problemas: "Pierde púrpura = falta luz | Tallos largos débiles = poda | Araña roja: rocía agua",
+                        especial: "CRECE RÁPIDO Y VIGOROSAMENTE. Hojas púrpura intenso (con sol). Flores moradas pequeñas. Perfecta propagar regalos. Cubre muros. Tóxica gatos (leve)."
+                    },
+                    {
+                        nombre: "Peperomia",
+                        cientifico: "Peperomia obtusifolia",
+                        emoji: "🪴",
+                        ubicacion: "Mesa, escritorio con luz",
+                        riego: "10-14 días",
+                        luz: "Media-Brillante",
+                        dificultad: "Fácil",
+                        sustrato: "Tierra + perlita (70/30). Compacta, no necesita mucho volumen.",
+                        humedad: "40-60%",
+                        temperatura: "18-28°C",
+                        poda: "Poda apical para ramificación. Tolera podas frecuentes.",
+                        reproduccion: "Hojas o esquejes tallo enraízan sustrato húmedo. 2-3 semanas.",
+                        nivelExigencia: "2/10 - Compacta y tolerante",
+                        problemas: "Hojas blandas = exceso agua | Tallos desnudos = poda | Cochinilla: inspección mensual",
+                        especial: "COMPACTA Y BONITA. Hojas gruesas acumulan agua - SIN EXCESOS. Ideal escritorio/mesa. Crece LENTAMENTE (ventaja). Flores espigas blancas. Superstición: dinero."
+                    },
+                    {
+                        nombre: "Meloncito de Jardín",
+                        cientifico: "Peperomia argyreia",
+                        emoji: "🍈",
+                        ubicacion: "Ventana con luz brillante",
+                        riego: "10-14 días",
+                        luz: "Brillante",
+                        dificultad: "Medio",
+                        sustrato: "Tierra + perlita (70/30). Compacta: maceta pequeña suficiente.",
+                        humedad: "50-70%",
+                        temperatura: "18-25°C",
+                        poda: "Mínima. Mantén forma natural.",
+                        reproduccion: "Hojas en sustrato húmedo. Enraíza 4-6 semanas. PACIENCIA.",
+                        nivelExigencia: "4/10 - Crece lentamente, requiere atención",
+                        problemas: "Vetas pálidas = baja humedad | Tallos débiles = más luz | EXCESO agua = muerte",
+                        especial: "✨ DECORATIVA: hojas parecen melón miniatura (vetas plateadas). Crece MUY LENTAMENTE. Flor roja. De colección: requiere atención consistente."
+                    },
+                    {
+                        nombre: "Planta China del Dinero",
+                        cientifico: "Pilea peperomioides",
+                        emoji: "🌿",
+                        ubicacion: "Ventana con luz brillante",
+                        riego: "7-10 días",
+                        luz: "Brillante (no directo)",
+                        dificultad: "Fácil",
+                        sustrato: "Tierra + perlita (60/40). Drenaje importante.",
+                        humedad: "50-70%",
+                        temperatura: "15-24°C",
+                        poda: "Poda apical para ramificación. Tolera podas.",
+                        reproduccion: "Offsetos basales cuando grandes. Enraíza agua 1-2 semanas.",
+                        nivelExigencia: "3/10 - Necesita rotación regular",
+                        problemas: "Tallos largos = gira cada semana | Caída hojas = cambio ubicación | Pegajosas = plagas",
+                        especial: "✨ DE MODA: hojas redondas adorables. Gira cada 3 días (crece hacia luz). LENTITUD es normal. Flores amarillas. Superstición: prosperidad."
+                    },
+                    {
+                        nombre: "Alocasia Frydek",
+                        cientifico: "Alocasia micholitziana 'Frydek'",
+                        emoji: "🖤",
+                        ubicacion: "Ventana este brillante",
+                        riego: "7-10 días",
+                        luz: "Brillante (NO directo)",
+                        dificultad: "Medio-Alto",
+                        sustrato: "Tierra + musgo + perlita (50/30/20). Drena pero mantiene algo humedad.",
+                        humedad: "60-80% IDEAL",
+                        temperatura: "20-28°C",
+                        poda: "Solo retira hojas muertas. Minimiza interferencia.",
+                        reproduccion: "Tubérculos cuando múltiples. MUY lento.",
+                        nivelExigencia: "6/10 - Exige humedad alta consistente",
+                        problemas: "Puntas marrones = baja humedad | Manchas = agua fría | Crece lento es NORMAL",
+                        especial: "🖤 HERMOSA: hojas negras con venas plateadas. Exige HUMEDAD ALTA. CRECE LENTAMENTE. Ideal terrario/baño. Tóxica. Requiere CONSISTENCIA."
+                    },
+                    {
+                        nombre: "Alocasia Macrorrhizos 'Variegata'",
+                        cientifico: "Alocasia macrorrhizos 'Variegata'",
+                        emoji: "🌿",
+                        ubicacion: "Ventana con buena luz",
+                        riego: "7-10 días",
+                        luz: "Brillante (indirecta)",
+                        dificultad: "Medio",
+                        sustrato: "Tierra + perlita + musgo (50/30/20). Crece rápido: trasplanta anualmente.",
+                        humedad: "60-80%",
+                        temperatura: "20-28°C",
+                        poda: "Retira hojas viejas/dañadas. Minimiza poda.",
+                        reproduccion: "Tubérculos, división rizomas, esquejes tallo con nudo aéreo.",
+                        nivelExigencia: "4/10 - Crece rápido pero exige luz",
+                        problemas: "Variegación débil = falta luz/nutrientes | Tallos blandos = humedad + aire pobre",
+                        especial: "✨ ESPECTACULAR: hojas grandes dorado-verde variegadas. Crece RÁPIDO y GRANDE (1.5m+). ESPACIO necesario. Tóxica. Hojas nuevas amarillas → doradas."
+                    }
+                ]
+            }
+        };
+
+        const tabsContainer = document.getElementById('tabs');
+        const content = document.getElementById('content');
+
+        // Crear botones de zonas
+        Object.keys(plantas).forEach((zoneKey, index) => {
+            const btn = document.createElement('button');
+            btn.className = `tab-btn zona${index + 1}${index === 0 ? ' active' : ''}`;
+            btn.textContent = `Zona ${index + 1}`;
+            btn.onclick = () => selectZone(zoneKey);
+            tabsContainer.appendChild(btn);
+        });
+
+        function selectZone(zoneKey) {
+            // Actualizar botones activos
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.textContent.includes(Object.keys(plantas).indexOf(zoneKey) + 1)) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Generar contenido
+            const zoneData = plantas[zoneKey];
+            content.innerHTML = '';
+
+            const zoneTitle = document.createElement('div');
+            zoneTitle.className = 'zone-title active';
+            zoneTitle.style.background = zoneData.gradient;
+            zoneTitle.textContent = zoneData.titulo;
+            content.appendChild(zoneTitle);
+
+            // Crear cards para cada planta
+            zoneData.plantas.forEach((planta, idx) => {
+                const card = document.createElement('div');
+                const zoneNum = Object.keys(plantas).indexOf(zoneKey) + 1;
+                card.className = `plant-card z${zoneNum}`;
+
+                card.innerHTML = `
+                    <div class="plant-header">
+                        <div class="plant-info">
+                            <div class="plant-name">${planta.nombre}</div>
+                            <div style="font-size: 0.75em; color: #999; font-style: italic; margin-bottom: 6px;">${planta.cientifico}</div>
+                            <div class="plant-location">📍 ${planta.ubicacion}</div>
+                            <div class="plant-badges">
+                                <div class="badge water">💧 ${planta.riego}</div>
+                                <div class="badge light">☀️ ${planta.luz}</div>
+                                <div class="badge difficulty">📊 ${planta.dificultad}</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                            <a class="photo-wrap" data-especie="${planta.cientifico}"
+                               href="${urlImagenes(planta)}" target="_blank" rel="noopener"
+                               title="Ver fotos de ${planta.nombre} en Google Imágenes">
+                                ${ilustracion(planta.nombre) || `<span class="fallback">${planta.emoji}</span>`}
+                                <span class="lupa">🔍</span>
+                            </a>
+                            <a class="btn-fotos" href="${urlImagenes(planta)}" target="_blank" rel="noopener">Ver fotos</a>
+                            <div class="toggle-icon">▼</div>
+                        </div>
+                    </div>
+                    <div class="plant-details">
+                        <div class="detail-content">
+                            <div class="detail-box">
+                                <h4>🌍 Sustrato</h4>
+                                <p>${planta.sustrato}</p>
+                            </div>
+                            <div class="detail-box">
+                                <h4>💨 Humedad</h4>
+                                <p>${planta.humedad}</p>
+                            </div>
+                            <div class="detail-box">
+                                <h4>🌡️ Temperatura</h4>
+                                <p>${planta.temperatura}</p>
+                            </div>
+                            <div class="detail-box">
+                                <h4>✂️ Poda</h4>
+                                <p>${planta.poda}</p>
+                            </div>
+                            <div class="detail-box">
+                                <h4>🌱 Reproducción</h4>
+                                <p>${planta.reproduccion}</p>
+                            </div>
+                            <div class="detail-box">
+                                <h4>📊 Nivel Exigencia</h4>
+                                <p>${planta.nivelExigencia}</p>
+                            </div>
+                            <div class="detail-box detail-full warning">
+                                <h4>⚠️ Problemas Comunes</h4>
+                                <p>${planta.problemas}</p>
+                            </div>
+                            <div class="detail-box detail-full success">
+                                <h4>💡 Cuidado Especial</h4>
+                                <p>${planta.especial}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                const headerElement = card.querySelector('.plant-header');
+                headerElement.onclick = function(ev) {
+                    // Si tocaron un enlace (ver fotos), no desplegar la ficha
+                    if (ev.target.closest('a')) return;
+                    card.classList.toggle('expanded');
+                };
+
+                content.appendChild(card);
+            });
+
+            cargarFotos();
+        }
+
+
+        /* ===== ILUSTRACIONES VECTORIALES =====
+           Dibujadas dentro del archivo. No dependen de internet ni de URLs. */
+
+        const ESPECIE = {
+            "Hoja de Hombre":                    {f:'corazon',    a:'#3f8f4a', b:'#5cb069', c:'#27632f'},
+            "Anturio":                           {f:'anturio',    a:'#2f7a3c', b:'#d92b4b', c:'#f2c14e'},
+            "Diefembaquia Reflectante":          {f:'moteada',    a:'#3d7d3f', b:'#cfe3a8', c:'#2a5a2c'},
+            "Poto Marble Queen":                 {f:'corazon',    a:'#4e9455', b:'#eef3e4', c:'#2f6636', v:'marmol'},
+            "Poto Neón":                         {f:'corazon',    a:'#a8cf3f', b:'#c9e460', c:'#7fa62c'},
+            "Potos Verde":                       {f:'corazon',    a:'#42904c', b:'#63b06d', c:'#2a6633'},
+            "Begonia Ala de Ángel":              {f:'begonia',    a:'#2e6b3a', b:'#e8eef0', c:'#9c2f45'},
+            "Philodendron Burle Marx":           {f:'flecha',     a:'#3c8747', b:'#59a562', c:'#255c2d', esbelta:1},
+            "Monstera Deliciosa":                {f:'monstera',   a:'#357f42', b:'#4d9a59', c:'#22592c'},
+            "Areca":                             {f:'palma',      a:'#57a355', b:'#78bd73', c:'#3d7c3c'},
+            "Árbol del Caucho":                  {f:'ovalada',    a:'#2f5d3a', b:'#436f4a', c:'#8f3b46'},
+            "Sansevieria":                       {f:'espada',     a:'#3f7a45', b:'#d3b45c', c:'#2b5a30'},
+            "Cuerno de Alce":                    {f:'cuerno',     a:'#5c9455', b:'#7fae74', c:'#a8935e'},
+            "Planta del Corazón":                {f:'hoya',       a:'#4a9450', b:'#68b06c', c:'#2f6636'},
+            "Nopalillo Mal Ojo":                 {f:'colgante',   a:'#4d9152', b:'#6cae6f', c:'#356b39'},
+            "Cactus Colgante":                   {f:'colgante',   a:'#2f6b3a', b:'#4a8a52', c:'#1f4d28'},
+            "Palma de Madagascar":               {f:'pachypodium',a:'#8a9186', b:'#4f8f4a', c:'#6b7268'},
+            "Cotyledon Pendens":                 {f:'suculenta',  a:'#6f9c7a', b:'#93b79b', c:'#c96b8e'},
+            "Zebrina":                           {f:'rayada',     a:'#6b4a8c', b:'#c9c3d6', c:'#8f5fa8'},
+            "Peperomia":                         {f:'ovalada',    a:'#48925a', b:'#66ab74', c:'#2f6b3d'},
+            "Meloncito de Jardín":               {f:'sandia',     a:'#2f6b45', b:'#cfd9c4', c:'#8c3f4a'},
+            "Planta China del Dinero":           {f:'moneda',     a:'#4f9c58', b:'#6fb877', c:'#3a7a42'},
+            "Alocasia Frydek":                   {f:'flecha',     a:'#1f4d2c', b:'#8fc79a', c:'#143a1f'},
+            "Alocasia Macrorrhizos 'Variegata'": {f:'flecha',     a:'#3f8a4a', b:'#eaf2e2', c:'#2a6633', v:'marmol'}
+        };
+
+        const FONDO = '#eef3ee';
+
+        function _venas(c){
+            return `<path d="M0,-22 L0,17" stroke="${c}" stroke-width="1.6" fill="none" opacity=".5" stroke-linecap="round"/>`;
+        }
+
+        // Hoja de corazón (potos, philodendron)
+        function _hojaCorazon(x,y,rot,esc,e){
+            const manchas = e.v==='marmol'
+                ? `<path d="M-9,-8 q5,4 2,10 q-6,2 -8,-4 z" fill="${e.b}" opacity=".85"/>
+                   <path d="M7,2 q4,5 0,9 q-5,0 -5,-6 z" fill="${e.b}" opacity=".75"/>
+                   <path d="M2,-16 q6,2 5,7 q-6,1 -7,-4 z" fill="${e.b}" opacity=".7"/>` : '';
+            return `<g transform="translate(${x},${y}) rotate(${rot}) scale(${esc})">
+                <path d="M0,-26 C12,-18 18,-6 16,6 C14,16 6,22 0,20 C-6,22 -14,16 -16,6 C-18,-6 -12,-18 0,-26 Z" fill="${e.a}"/>
+                ${manchas}${_venas(e.c)}</g>`;
+        }
+
+        function dibujoCorazon(e){
+            return _hojaCorazon(30,30,-28,.85,e) + _hojaCorazon(56,36,22,.78,e) + _hojaCorazon(40,58,-4,.7,e);
+        }
+
+        function dibujoMonstera(e){
+            return `<g transform="translate(42,44) scale(1.15)">
+                <path d="M0,-30 C15,-22 23,-8 21,8 C19,21 9,29 0,27 C-9,29 -19,21 -21,8 C-23,-8 -15,-22 0,-30 Z" fill="${e.a}"/>
+                <path d="M23,-6 L6,-4 L23,0 Z" fill="${FONDO}"/>
+                <path d="M22,7 L5,8 L21,13 Z" fill="${FONDO}"/>
+                <path d="M-23,-6 L-6,-4 L-23,0 Z" fill="${FONDO}"/>
+                <path d="M-22,7 L-5,8 L-21,13 Z" fill="${FONDO}"/>
+                <ellipse cx="-9" cy="-13" rx="3.4" ry="2.2" fill="${FONDO}"/>
+                <ellipse cx="9" cy="-14" rx="3" ry="2" fill="${FONDO}"/>
+                <path d="M0,-27 L0,25" stroke="${e.c}" stroke-width="1.8" opacity=".5" stroke-linecap="round"/>
+            </g>`;
+        }
+
+        function dibujoEspada(e){
+            let s='';
+            [-26,-13,0,13,26].forEach((r,i)=>{
+                const h = i===2 ? 1 : (i%2===0 ? .82 : .92);
+                s += `<g transform="translate(42,66) rotate(${r}) scale(1,${h})">
+                    <path d="M0,0 C-6,-22 -5,-44 0,-60 C5,-44 6,-22 0,0 Z" fill="${e.a}"/>
+                    <path d="M0,-4 C-4,-24 -3,-42 0,-54" stroke="${e.b}" stroke-width="1.4" fill="none" opacity=".9"/>
+                </g>`;
+            });
+            return s;
+        }
+
+        function dibujoPalma(e){
+            let s=`<path d="M42,74 L42,44" stroke="${e.c}" stroke-width="2.4" stroke-linecap="round"/>`;
+            [-62,-30,0,30,62].forEach(r=>{
+                let hojuelas='';
+                for(let t=8;t<=30;t+=4.4){
+                    const yy=-t*0.92, xx=t*0.42;
+                    hojuelas += `<ellipse cx="${xx.toFixed(1)}" cy="${yy.toFixed(1)}" rx="2.1" ry="5" fill="${e.b}" transform="rotate(-32 ${xx.toFixed(1)} ${yy.toFixed(1)})"/>`;
+                    hojuelas += `<ellipse cx="${(-xx).toFixed(1)}" cy="${yy.toFixed(1)}" rx="2.1" ry="5" fill="${e.a}" transform="rotate(32 ${(-xx).toFixed(1)} ${yy.toFixed(1)})"/>`;
+                }
+                s+=`<g transform="translate(42,44) rotate(${r})"><path d="M0,4 C0,-8 0,-22 0,-32" stroke="${e.c}" stroke-width="1.6" fill="none"/>${hojuelas}</g>`;
+            });
+            return s;
+        }
+
+        function dibujoOvalada(e){
+            const h=(x,y,r,sc,col)=>`<g transform="translate(${x},${y}) rotate(${r}) scale(${sc})">
+                <ellipse cx="0" cy="0" rx="13" ry="21" fill="${col}"/>
+                <path d="M0,-18 L0,18" stroke="${e.c}" stroke-width="1.5" opacity=".55" stroke-linecap="round"/></g>`;
+            return `<path d="M42,74 L42,34" stroke="${e.c}" stroke-width="2.6" stroke-linecap="round"/>`
+                 + h(26,32,-30,.86,e.a)+h(58,36,28,.8,e.b)+h(42,22,0,.72,e.a)+h(30,56,-18,.66,e.b);
+        }
+
+        function dibujoMoneda(e){
+            let s=`<path d="M42,76 L42,52" stroke="${e.c}" stroke-width="2.4" stroke-linecap="round"/>`;
+            const pos=[[22,26,.9],[42,16,1],[62,28,.88],[28,46,.78],[58,48,.76],[42,38,.7]];
+            pos.forEach(([x,y,sc])=>{
+                s+=`<path d="M42,54 Q${(42+x)/2},${(54+y)/2+4} ${x},${y}" stroke="${e.c}" stroke-width="1.6" fill="none" opacity=".8"/>`;
+                s+=`<circle cx="${x}" cy="${y}" r="${(11*sc).toFixed(1)}" fill="${e.a}"/>`;
+                s+=`<circle cx="${x}" cy="${y}" r="${(2.2*sc).toFixed(1)}" fill="${e.b}"/>`;
+            });
+            return s;
+        }
+
+        function dibujoFlecha(e){
+            const w = e.esbelta ? .72 : 1;
+            const hoja=(x,y,r,sc)=>`<g transform="translate(${x},${y}) rotate(${r}) scale(${(sc*w).toFixed(2)},${sc})">
+                <path d="M0,-30 C13,-20 19,-4 15,10 C11,22 4,26 0,26 C-4,26 -11,22 -15,10 C-19,-4 -13,-20 0,-30 Z" fill="${e.a}"/>
+                <path d="M0,-26 L0,22" stroke="${e.b}" stroke-width="2" opacity=".9" stroke-linecap="round"/>
+                <path d="M0,-14 L-11,-2 M0,-14 L11,-2 M0,-2 L-12,10 M0,-2 L12,10 M0,9 L-9,18 M0,9 L9,18"
+                      stroke="${e.b}" stroke-width="1.4" fill="none" opacity=".8" stroke-linecap="round"/>
+            </g>`;
+            return `<path d="M42,76 L42,50" stroke="${e.c}" stroke-width="2.4" stroke-linecap="round"/>`
+                 + hoja(26,40,-22,.72)+hoja(58,42,20,.68)+hoja(42,34,0,.92);
+        }
+
+        function dibujoAnturio(e){
+            return `<path d="M42,76 L42,48" stroke="${e.a}" stroke-width="2.4" stroke-linecap="round"/>
+                <g transform="translate(26,44) rotate(-20) scale(.7)">
+                    <path d="M0,-26 C12,-18 18,-6 16,6 C14,16 6,22 0,20 C-6,22 -14,16 -16,6 C-18,-6 -12,-18 0,-26 Z" fill="${e.a}"/></g>
+                <g transform="translate(58,50) rotate(24) scale(.62)">
+                    <path d="M0,-26 C12,-18 18,-6 16,6 C14,16 6,22 0,20 C-6,22 -14,16 -16,6 C-18,-6 -12,-18 0,-26 Z" fill="${e.a}"/></g>
+                <g transform="translate(44,26) scale(.85)">
+                    <path d="M0,-20 C13,-13 18,-1 15,10 C11,19 4,23 0,21 C-4,23 -11,19 -15,10 C-18,-1 -13,-13 0,-20 Z" fill="${e.b}"/>
+                    <path d="M2,-16 C6,-16 7,-10 6,-2 C5,6 3,10 1,10 C-1,10 -1,4 0,-4 C1,-11 0,-16 2,-16 Z" fill="${e.c}"/>
+                </g>`;
+        }
+
+        function dibujoMoteada(e){
+            let s=`<path d="M42,76 L42,50" stroke="${e.a}" stroke-width="2.6" stroke-linecap="round"/>`;
+            const hoja=(x,y,r,sc)=>{
+                let m='';
+                [[-5,-8],[4,-3],[-3,6],[6,9],[0,-14],[-7,2]].forEach(([mx,my])=>{
+                    m+=`<ellipse cx="${mx}" cy="${my}" rx="3.4" ry="2.4" fill="${e.b}" opacity=".9" transform="rotate(-20 ${mx} ${my})"/>`;
+                });
+                return `<g transform="translate(${x},${y}) rotate(${r}) scale(${sc})">
+                    <ellipse rx="13" ry="22" fill="${e.a}"/>${m}
+                    <path d="M0,-19 L0,19" stroke="${e.c}" stroke-width="1.5" opacity=".6"/></g>`;
+            };
+            return s + hoja(25,36,-32,.82) + hoja(59,40,30,.78) + hoja(42,26,-2,.86);
+        }
+
+        function dibujoBegonia(e){
+            const ala=(x,y,r,sc)=>{
+                let p='';
+                [[-4,-10],[3,-6],[-6,0],[2,4],[-2,11],[6,-1],[-8,7]].forEach(([mx,my])=>{
+                    p+=`<circle cx="${mx}" cy="${my}" r="1.9" fill="${e.b}" opacity=".95"/>`;
+                });
+                return `<g transform="translate(${x},${y}) rotate(${r}) scale(${sc})">
+                    <path d="M0,-22 C14,-18 20,-2 15,12 C10,22 2,24 -2,20 C-9,14 -13,2 -11,-10 C-9,-18 -5,-23 0,-22 Z" fill="${e.a}"/>
+                    ${p}</g>`;
+            };
+            return `<path d="M42,76 L42,48" stroke="${e.c}" stroke-width="2.4" stroke-linecap="round"/>`
+                + ala(26,38,-24,.8) + ala(58,42,26,.75) + ala(43,24,4,.7)
+                + `<circle cx="60" cy="66" r="3.4" fill="${e.c}"/><circle cx="52" cy="70" r="2.6" fill="${e.c}"/>`;
+        }
+
+        function dibujoCuerno(e){
+            return `<ellipse cx="42" cy="62" rx="20" ry="13" fill="${e.c}" opacity=".55"/>
+            <g stroke="${e.a}" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M42,64 L42,42"/>
+                <path d="M42,44 L28,28 M28,28 L18,16 M28,28 L26,12"/>
+                <path d="M42,44 L56,28 M56,28 L66,16 M56,28 L58,12"/>
+            </g>
+            <g stroke="${e.b}" stroke-width="2.4" fill="none" stroke-linecap="round">
+                <path d="M42,44 L30,30 M42,44 L54,30"/>
+            </g>`;
+        }
+
+        function dibujoHoya(e){
+            return `<path d="M42,78 L42,44" stroke="${e.c}" stroke-width="3" stroke-linecap="round"/>
+            <g transform="translate(42,34) scale(1.35)">
+                <path d="M0,20 C-14,10 -20,-6 -12,-16 C-7,-22 -1,-19 0,-13 C1,-19 7,-22 12,-16 C20,-6 14,10 0,20 Z" fill="${e.a}"/>
+                <path d="M0,16 C-9,8 -13,-3 -9,-11" stroke="${e.b}" stroke-width="1.6" fill="none" opacity=".85"/>
+            </g>`;
+        }
+
+        function dibujoColgante(e){
+            let s='';
+            const xs=[16,25,34,42,50,59,68];
+            xs.forEach((x,i)=>{
+                const largo=42+((i*13)%26);
+                const col = i%2 ? e.a : e.b;
+                s+=`<path d="M${x},6 C${x-5},${6+largo*.35} ${x+5},${6+largo*.7} ${x-2},${6+largo}"
+                     stroke="${col}" stroke-width="3.2" fill="none" stroke-linecap="round"/>`;
+                for(let k=1;k<=3;k++){
+                    const yy=6+largo*(k/3.4);
+                    s+=`<circle cx="${x+(k%2?-2:2)}" cy="${yy.toFixed(0)}" r="1.5" fill="${e.c}" opacity=".7"/>`;
+                }
+            });
+            return s;
+        }
+
+        function dibujoSuculenta(e){
+            let s=`<path d="M42,6 C36,22 48,38 40,54 C34,66 44,72 42,78" stroke="${e.c}" stroke-width="2" fill="none" opacity=".5"/>`;
+            const pos=[[42,12],[33,22],[51,26],[38,36],[50,44],[36,52],[47,60],[40,70]];
+            pos.forEach(([x,y],i)=>{
+                const r = i%2 ? -18 : 16;
+                s+=`<g transform="translate(${x},${y}) rotate(${r})">
+                    <ellipse rx="7.5" ry="11" fill="${i%2?e.a:e.b}"/>
+                    <ellipse cx="-2" cy="-3" rx="2.6" ry="4.5" fill="#ffffff" opacity=".28"/></g>`;
+            });
+            s+=`<circle cx="60" cy="70" r="4" fill="${e.c}"/><circle cx="66" cy="62" r="3" fill="${e.c}" opacity=".8"/>`;
+            return s;
+        }
+
+        function dibujoRayada(e){
+            const hoja=(x,y,r,sc)=>`<g transform="translate(${x},${y}) rotate(${r}) scale(${sc})">
+                <path d="M0,-24 C10,-16 13,0 8,14 C5,21 1,24 0,24 C-1,24 -5,21 -8,14 C-13,0 -10,-16 0,-24 Z" fill="${e.a}"/>
+                <path d="M-4,-16 C-7,-4 -6,8 -3,18" stroke="${e.b}" stroke-width="2.2" fill="none" opacity=".95" stroke-linecap="round"/>
+                <path d="M4,-16 C7,-4 6,8 3,18" stroke="${e.b}" stroke-width="2.2" fill="none" opacity=".95" stroke-linecap="round"/>
+                <path d="M0,-20 L0,20" stroke="${e.c}" stroke-width="1.4" opacity=".7"/></g>`;
+            return `<path d="M12,72 C26,62 34,50 42,38" stroke="${e.c}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`
+                + hoja(24,30,-34,.72)+hoja(56,32,32,.7)+hoja(42,20,0,.66)+hoja(34,54,-16,.6)+hoja(60,58,22,.56);
+        }
+
+        function dibujoSandia(e){
+            let rayas='';
+            for(let i=-3;i<=3;i++){
+                rayas+=`<path d="M0,-18 C${i*4.2},-6 ${i*4.6},6 ${i*3},17" stroke="${e.b}" stroke-width="1.9" fill="none" opacity=".85" stroke-linecap="round"/>`;
+            }
+            const hoja=(x,y,r,sc)=>`<g transform="translate(${x},${y}) rotate(${r}) scale(${sc})">
+                <ellipse rx="15" ry="21" fill="${e.a}"/>${rayas}</g>`;
+            return `<path d="M42,78 L42,52" stroke="${e.c}" stroke-width="2.4" stroke-linecap="round"/>`
+                + hoja(26,38,-26,.72)+hoja(58,42,24,.68)+hoja(42,28,0,.82);
+        }
+
+        function dibujoPachypodium(e){
+            let espinas='';
+            for(let y=30;y<=70;y+=7){
+                const w=(70-y)*0.06+3.5;
+                espinas+=`<path d="M${42-w},${y} L${42-w-4},${y-2}" stroke="${e.c}" stroke-width="1.5" stroke-linecap="round"/>`;
+                espinas+=`<path d="M${42+w},${y} L${42+w+4},${y-2}" stroke="${e.c}" stroke-width="1.5" stroke-linecap="round"/>`;
+            }
+            let hojas='';
+            [-70,-45,-20,0,20,45,70].forEach(r=>{
+                hojas+=`<g transform="translate(42,26) rotate(${r})">
+                    <ellipse cx="0" cy="-13" rx="3.6" ry="13" fill="${e.b}"/></g>`;
+            });
+            return `<path d="M36,76 C36,54 38,36 40,26 L44,26 C46,36 48,54 48,76 Z" fill="${e.a}"/>
+                ${espinas}${hojas}<circle cx="42" cy="26" r="3" fill="${e.b}"/>`;
+        }
+
+        const DIBUJOS = {
+            corazon:dibujoCorazon, monstera:dibujoMonstera, espada:dibujoEspada, palma:dibujoPalma,
+            ovalada:dibujoOvalada, moneda:dibujoMoneda, flecha:dibujoFlecha, anturio:dibujoAnturio,
+            moteada:dibujoMoteada, begonia:dibujoBegonia, cuerno:dibujoCuerno, hoya:dibujoHoya,
+            colgante:dibujoColgante, suculenta:dibujoSuculenta, rayada:dibujoRayada,
+            sandia:dibujoSandia, pachypodium:dibujoPachypodium
+        };
+
+        function ilustracion(nombre){
+            const e = ESPECIE[nombre];
+            if(!e) return '';
+            const fn = DIBUJOS[e.f];
+            if(!fn) return '';
+            return `<svg viewBox="0 0 84 84" class="plant-svg" role="img" aria-label="${nombre}">
+                <rect width="84" height="84" rx="12" fill="${FONDO}"/>
+                ${fn(e)}
+            </svg>`;
+        }
+
+
+        /* ===== FOTOS REALES (capa opcional sobre el dibujo) =====
+           Consulta la API de Wikipedia con el nombre científico.
+           Si hay internet y el navegador lo permite, la foto cubre la ilustración.
+           Si falla cualquier cosa, se queda el dibujo. */
+
+        const cacheFotos = {};
+
+        function variantesNombre(cientifico){
+            const v = [];
+            const push = s => { s = (s||'').trim(); if(s && !v.includes(s)) v.push(s); };
+            push(cientifico.replace(/['\u2018\u2019"]/g,''));
+            const sinCultivar = cientifico.replace(/\s*['\u2018\u2019"][^'\u2018\u2019"]*['\u2018\u2019"]\s*/g,' ');
+            push(sinCultivar);
+            const partes = sinCultivar.trim().split(/\s+/);
+            if(partes.length >= 2) push(partes[0] + ' ' + partes[1]);
+            push(partes[0]);
+            return v;
+        }
+
+        async function buscarFoto(cientifico){
+            if(cientifico in cacheFotos) return cacheFotos[cientifico];
+            for(const nombre of variantesNombre(cientifico)){
+                for(const wiki of ['en','es']){
+                    try{
+                        const url = 'https://' + wiki + '.wikipedia.org/api/rest_v1/page/summary/'
+                                  + encodeURIComponent(nombre.replace(/ /g,'_')) + '?origin=*';
+                        const r = await fetch(url);
+                        if(!r.ok) continue;
+                        const d = await r.json();
+                        const img = (d.thumbnail && d.thumbnail.source) || (d.originalimage && d.originalimage.source);
+                        if(img){
+                            const grande = img.replace(/\/\d+px-/, '/400px-');
+                            cacheFotos[cientifico] = grande;
+                            return grande;
+                        }
+                    }catch(err){ /* intentar la siguiente variante */ }
+                }
+            }
+            cacheFotos[cientifico] = null;
+            return null;
+        }
+
+        function cargarFotos(){
+            document.querySelectorAll('.photo-wrap[data-especie]').forEach(async wrap => {
+                if(wrap.dataset.listo) return;
+                wrap.dataset.listo = '1';
+                let src = null;
+                try{ src = await buscarFoto(wrap.dataset.especie); }catch(err){ return; }
+                if(!src) return;
+                const img = document.createElement('img');
+                img.className = 'plant-photo';
+                img.alt = wrap.dataset.especie;
+                img.referrerPolicy = 'no-referrer';
+                img.onload = () => img.classList.add('loaded');
+                img.onerror = () => img.remove();
+                img.src = src;
+                wrap.appendChild(img);
+            });
+        }
+
+        /* Enlace a Google Imágenes: nombre científico + nombre común
+           (el común ayuda cuando el cultivar no es muy conocido) */
+        function urlImagenes(planta){
+            const q = planta.cientifico + ' ' + planta.nombre + ' planta';
+            return 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(q);
+        }
+
+        // Inicializar con zona 1
+        selectZone('zona1');
+    </script>
+</body>
+</html>
