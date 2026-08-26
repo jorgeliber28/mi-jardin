@@ -1,434 +1,567 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Mi Jardín - Guía de Plantas</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="Catálogo de las 24 plantas de interior de la casa: riego, luz, sustrato, poda y problemas comunes, agrupadas por zona de luz.">
+<meta name="theme-color" content="#E9E5D8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171611" media="(prefers-color-scheme: dark)">
+<title>Mi Jardín</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Archivo:wght@400;500;600&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+/* ==========================================================================
+   MI JARDÍN — catálogo de plantas de interior
+   Tratamiento visual: pliego de herbario. Papel de montaje, lámina montada
+   a la izquierda, etiqueta mecanografiada con los datos del espécimen.
+   Paleta: papel/tinta/verde de herbario; el carmín es tinta de sello y solo
+   aparece en advertencias reales (toxicidad, problemas).
+   ========================================================================== */
 
-        :root {
-            --zona1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --zona2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --zona3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --zona4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            --zona5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        }
+:root{
+    --papel:      #E9E5D8;   /* cartón de montaje */
+    --ficha:      #F4F1E4;   /* pliego del espécimen */
+    --tinta:      #211F19;
+    --tinta-2:    #6E695B;
+    --tinta-3:    #918B79;
+    --verde:      #3F5233;   /* verde de herbario: el acento */
+    --verde-2:    #6B7F55;
+    --carmin:     #8E2B22;   /* tinta de sello: solo advertencias */
+    --linea:      #CBC5B2;
+    --linea-2:    #DDD8C7;
+    --sombra:     0 1px 2px rgba(33,31,25,.05), 0 6px 18px -12px rgba(33,31,25,.22);
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
-            padding: 0;
-            margin: 0;
-            overflow-x: hidden;
-        }
+    --serif:  'EB Garamond', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+    --sans:   'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --mecano: 'Courier Prime', 'Courier New', Courier, monospace;
 
-        .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+    --ancho: 660px;
+}
 
-        .header h1 {
-            font-size: 1.8em;
-            margin-bottom: 5px;
-        }
+@media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+        --papel:   #171611;
+        --ficha:   #201E18;
+        --tinta:   #E9E4D5;
+        --tinta-2: #9A937F;
+        --tinta-3: #7C7663;
+        --verde:   #9CB37E;
+        --verde-2: #7F9464;
+        --carmin:  #D2786C;
+        --linea:   #383527;
+        --linea-2: #2C2A20;
+        --sombra:  0 1px 2px rgba(0,0,0,.35), 0 6px 18px -12px rgba(0,0,0,.7);
+    }
+}
+:root[data-theme="dark"]{
+    --papel:   #171611;
+    --ficha:   #201E18;
+    --tinta:   #E9E4D5;
+    --tinta-2: #9A937F;
+    --tinta-3: #7C7663;
+    --verde:   #9CB37E;
+    --verde-2: #7F9464;
+    --carmin:  #D2786C;
+    --linea:   #383527;
+    --linea-2: #2C2A20;
+    --sombra:  0 1px 2px rgba(0,0,0,.35), 0 6px 18px -12px rgba(0,0,0,.7);
+}
 
-        .header p {
-            font-size: 0.85em;
-            opacity: 0.9;
-        }
+*, *::before, *::after{ box-sizing: border-box; }
+html{ -webkit-text-size-adjust: 100%; }
+body{
+    margin: 0;
+    background: var(--papel);
+    color: var(--tinta);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+a{ color: inherit; }
+:focus-visible{
+    outline: 2px solid var(--verde);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
 
-        .tabs {
-            display: flex;
-            gap: 5px;
-            overflow-x: auto;
-            padding: 15px 10px;
-            background: white;
-            scroll-behavior: smooth;
-            scrollbar-width: none;
-        }
+/* ---------- Cabecera del pliego ---------------------------------------- */
 
-        .tabs::-webkit-scrollbar {
-            display: none;
-        }
+.masthead{
+    max-width: var(--ancho);
+    margin: 0 auto;
+    padding: 34px 20px 0;
+}
+.masthead h1{
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(1.9rem, 7vw, 2.6rem);
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    text-indent: .22em;
+    text-align: center;
+    margin: 0 0 10px;
+    text-wrap: balance;
+}
+.masthead .sub{
+    font-family: var(--mecano);
+    font-size: .68rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--tinta-2);
+    text-align: center;
+    margin: 0 0 16px;
+}
+/* filete doble: grueso + fino, como en las láminas impresas */
+.filete{
+    border-top: 2px solid var(--tinta);
+    border-bottom: 1px solid var(--tinta);
+    height: 4px;
+    opacity: .8;
+}
 
-        .tab-btn {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 20px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-            flex-shrink: 0;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-            color: white;
-            border: 2px solid transparent;
-        }
+/* ---------- Navegación por zonas --------------------------------------- */
 
-        .tab-btn.zona1 { background: var(--zona1); }
-        .tab-btn.zona2 { background: var(--zona2); }
-        .tab-btn.zona3 { background: var(--zona3); }
-        .tab-btn.zona4 { background: var(--zona4); }
-        .tab-btn.zona5 { background: var(--zona5); }
+.nav-wrap{
+    position: relative;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--papel);
+    border-bottom: 1px solid var(--linea);
+}
+.nav{
+    max-width: var(--ancho);
+    margin: 0 auto;
+    display: flex;
+    gap: 22px;
+    overflow-x: auto;
+    padding: 12px 20px 0;
+    scrollbar-width: none;
+}
+.nav::-webkit-scrollbar{ display: none; }
+/* insinúa que la fila sigue hacia la derecha */
+.nav-wrap::after{
+    content: "";
+    position: absolute;
+    top: 0; right: 0; bottom: 1px;
+    width: 34px;
+    pointer-events: none;
+    background: linear-gradient(to right, transparent, var(--papel));
+}
+@media (min-width: 720px){ .nav-wrap::after{ display: none; } }
+.nav button{
+    appearance: none;
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    padding: 0 0 9px;
+    margin: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+    color: var(--tinta-2);
+    font-family: var(--mecano);
+    font-size: .72rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    transition: color .18s ease, border-color .18s ease;
+}
+.nav button:hover{ color: var(--tinta); }
+.nav button[aria-selected="true"]{
+    color: var(--verde);
+    border-bottom-color: var(--verde);
+}
 
-        .tab-btn.active {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
+/* ---------- Buscador ---------------------------------------------------- */
 
-        .container {
-            padding: 10px;
-            max-width: 600px;
-            margin: 0 auto;
-            padding-bottom: 40px;
-        }
+.buscador{
+    max-width: var(--ancho);
+    margin: 0 auto;
+    padding: 16px 20px 0;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    border-bottom: 1px solid var(--linea-2);
+}
+.buscador label{
+    font-family: var(--mecano);
+    font-size: .64rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--tinta-3);
+    flex-shrink: 0;
+}
+.buscador input{
+    flex: 1;
+    min-width: 0;
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 0 0 12px;
+    color: var(--tinta);
+    font-family: var(--mecano);
+    font-size: .88rem;
+}
+.buscador input::placeholder{ color: var(--tinta-3); }
+.buscador input:focus{ outline: none; }
+.buscador:focus-within{ border-bottom-color: var(--verde); }
 
-        .zone-title {
-            font-size: 1.1em;
-            font-weight: 700;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            color: white;
-            display: none;
-        }
+/* ---------- Encabezado de sección --------------------------------------- */
 
-        .zone-title.active { display: block; }
+.hoja{
+    max-width: var(--ancho);
+    margin: 0 auto;
+    padding: 0 20px 56px;
+}
+.seccion{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 26px 0 14px;
+}
+.seccion h2{
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 1.45rem;
+    margin: 0;
+    line-height: 1.15;
+}
+.seccion .desc{
+    font-family: var(--mecano);
+    font-size: .66rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--tinta-2);
+    margin-top: 4px;
+}
+.seccion .conteo{
+    font-family: var(--mecano);
+    font-size: .66rem;
+    letter-spacing: .1em;
+    color: var(--tinta-3);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
 
-        .plant-card {
-            background: white;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border-left: 5px solid #667eea;
-        }
+/* ---------- Ficha de espécimen ------------------------------------------ */
 
-        .plant-card.z1 { border-left-color: #667eea; }
-        .plant-card.z2 { border-left-color: #f5576c; }
-        .plant-card.z3 { border-left-color: #00f2fe; }
-        .plant-card.z4 { border-left-color: #43e97b; }
-        .plant-card.z5 { border-left-color: #fa709a; }
+.ficha{
+    background: var(--ficha);
+    border: 1px solid var(--linea);
+    box-shadow: var(--sombra);
+    margin-bottom: 14px;
+}
+.ficha-top{
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 16px;
+    padding: 16px;
+    align-items: start;
+}
 
-        .plant-header {
-            padding: 15px;
-            cursor: pointer;
-            user-select: none;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            justify-content: space-between;
-        }
+/* la lámina montada: enlace a fotos reales */
+.marco{
+    position: relative;
+    display: block;
+    width: 96px;
+    height: 96px;
+    padding: 5px;
+    background: #F4F1E4;
+    border: 1px solid var(--linea);
+    text-decoration: none;
+    transition: border-color .18s ease, transform .18s ease;
+}
+.marco:hover{ border-color: var(--verde); }
+.marco:active{ transform: scale(.97); }
+.marco .lienzo{
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+.plant-svg{ width: 100%; height: 100%; display: block; }
+.plant-photo{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity .45s ease;
+}
+.plant-photo.loaded{ opacity: 1; }
+.sin-lamina{
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--tinta-3);
+}
+/* indicador de que la lámina lleva a fotos */
+.marco .lupa{
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(244,241,228,.94);
+    border: 1px solid var(--linea);
+    color: #3F5233;
+}
+.marco .lupa svg{ width: 11px; height: 11px; }
 
-        .plant-header:active {
-            background: #f9f9f9;
-        }
+/* el resumen es el botón que despliega la ficha */
+.resumen{
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    text-align: left;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    display: block;
+}
+.linea-sup{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+}
+.linea-sup > span:first-child{ min-width: 0; }
+.acceso{
+    font-family: var(--mecano);
+    font-size: .6rem;
+    letter-spacing: .1em;
+    color: var(--tinta-3);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.nombre{
+    display: block;
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1.24rem;
+    line-height: 1.15;
+    margin: 0;
+    text-wrap: balance;
+}
+.binomio{
+    display: block;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--tinta-2);
+    margin: 1px 0 0;
+}
+.sitio{
+    display: block;
+    font-family: var(--mecano);
+    font-size: .64rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--tinta-3);
+    margin: 7px 0 0;
+}
+.sello{
+    display: inline-block;
+    margin-left: 9px;
+    padding: 1px 6px;
+    vertical-align: baseline;
+    border: 1px solid var(--carmin);
+    color: var(--carmin);
+    font-family: var(--mecano);
+    font-weight: 700;
+    font-size: .58rem;
+    letter-spacing: .16em;
+    transform: rotate(-1.5deg);
+}
 
-        .plant-icon {
-            font-size: 2.5em;
-            flex-shrink: 0;
-        }
+/* etiqueta mecanografiada con los tres datos de campo */
+.etiqueta{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 12px;
+    border-top: 1px solid var(--linea-2);
+}
+.etiqueta > span{
+    padding: 9px 10px 0 0;
+}
+.etiqueta > span + span{
+    border-left: 1px solid var(--linea-2);
+    padding-left: 10px;
+}
+.etiqueta .dt{
+    display: block;
+    font-family: var(--mecano);
+    font-size: .56rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--tinta-3);
+    margin: 0 0 2px;
+}
+.etiqueta .dd{
+    display: block;
+    margin: 0;
+    font-size: .84rem;
+    font-weight: 500;
+    line-height: 1.25;
+    font-variant-numeric: tabular-nums;
+}
 
-        .photo-wrap {
-            width: 84px;
-            height: 84px;
-            border-radius: 10px;
-            flex-shrink: 0;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-        }
+.chevron{
+    display: block;
+    margin: 12px auto 0;
+    width: 15px;
+    height: 15px;
+    color: var(--tinta-3);
+    transition: transform .28s ease, color .18s ease;
+}
+.ficha.abierta .chevron{ transform: rotate(180deg); color: var(--verde); }
+.resumen:hover .chevron{ color: var(--verde); }
 
-        .photo-wrap .fallback {
-            font-size: 2.2em;
-            line-height: 1;
-        }
+/* ---------- Detalle desplegable ----------------------------------------- */
 
-        .photo-wrap {
-            text-decoration: none;
-            cursor: pointer;
-        }
+.detalle{
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .3s ease;
+}
+.ficha.abierta .detalle{ grid-template-rows: 1fr; }
+.detalle > .interior{ overflow: hidden; }
 
-        .photo-wrap .lupa {
-            position: absolute;
-            right: 3px;
-            bottom: 3px;
-            font-size: 0.72em;
-            background: rgba(255,255,255,.92);
-            border-radius: 50%;
-            width: 19px;
-            height: 19px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,.25);
-        }
+.campos{
+    border-top: 1px solid var(--linea);
+    padding: 4px 16px 16px;
+}
+.campo{
+    display: grid;
+    grid-template-columns: 18px 1fr;
+    gap: 10px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--linea-2);
+}
+.campo:last-child{ border-bottom: 0; }
+.campo svg{
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    color: var(--verde);
+}
+.campo h3{
+    font-family: var(--mecano);
+    font-size: .6rem;
+    font-weight: 400;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--tinta-2);
+    margin: 0 0 3px;
+}
+.campo p{
+    margin: 0;
+    max-width: 64ch;
+    font-size: .89rem;
+    line-height: 1.5;
+    color: var(--tinta);
+}
+.campo.aviso svg{ color: var(--carmin); }
+.campo.aviso h3{ color: var(--carmin); }
 
-        .photo-wrap:active {
-            transform: scale(.94);
-        }
+/* en pantallas anchas, los datos cortos van en dos columnas */
+@media (min-width: 620px){
+    .campos{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 26px;
+    }
+    .campo.ancho{ grid-column: 1 / -1; }
+}
 
-        .btn-fotos {
-            display: inline-block;
-            font-size: 0.7em;
-            font-weight: 600;
-            color: #1a73e8;
-            background: #e8f0fe;
-            border-radius: 999px;
-            padding: 4px 10px;
-            text-decoration: none;
-            white-space: nowrap;
-        }
+/* ---------- Pie ---------------------------------------------------------- */
 
-        .btn-fotos:active {
-            background: #d2e3fc;
-        }
+.vacio{
+    font-family: var(--mecano);
+    font-size: .78rem;
+    color: var(--tinta-2);
+    padding: 34px 0;
+    text-align: center;
+}
+.pie{
+    max-width: var(--ancho);
+    margin: 0 auto;
+    padding: 0 20px 44px;
+    border-top: 1px solid var(--linea);
+    padding-top: 18px;
+    font-family: var(--mecano);
+    font-size: .64rem;
+    line-height: 1.7;
+    letter-spacing: .06em;
+    color: var(--tinta-3);
+}
+.pie a{ color: var(--tinta-2); }
 
-        .plant-svg {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
+@media (max-width: 400px){
+    .masthead{ padding-top: 26px; }
+    .masthead .sub{ font-size: .6rem; letter-spacing: .1em; }
+    .ficha-top{ grid-template-columns: 84px 1fr; gap: 13px; padding: 14px; }
+    .marco{ width: 84px; height: 84px; }
+    .nombre{ font-size: 1.15rem; }
+    .binomio{ font-size: .95rem; }
+    .etiqueta > span{ padding-right: 7px; }
+    .etiqueta > span + span{ padding-left: 7px; }
+    .etiqueta .dd{ font-size: .79rem; }
+}
 
-        .plant-photo {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 10px;
-            opacity: 0;
-            transition: opacity .4s ease;
-        }
-
-        .plant-photo.loaded { opacity: 1; }
-
-        .plant-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .plant-name {
-            font-weight: 700;
-            font-size: 1.05em;
-            color: #333;
-            margin-bottom: 3px;
-        }
-
-        .plant-location {
-            font-size: 0.85em;
-            color: #999;
-            margin-bottom: 5px;
-        }
-
-        .plant-badges {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .badge {
-            font-size: 0.75em;
-            padding: 3px 8px;
-            border-radius: 12px;
-            background: #f0f0f0;
-            color: #666;
-            font-weight: 500;
-        }
-
-        .badge.water { background: #e3f2fd; color: #1976d2; }
-        .badge.light { background: #fff3e0; color: #f57c00; }
-        .badge.difficulty { background: #fce4ec; color: #c2185b; }
-
-        .toggle-icon {
-            font-size: 1.5em;
-            transition: transform 0.3s ease;
-            color: #999;
-        }
-
-        .plant-card.expanded .toggle-icon {
-            transform: rotate(180deg);
-        }
-
-        .plant-details {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-            background: #fafafa;
-        }
-
-        .plant-card.expanded .plant-details {
-            max-height: 3000px;
-        }
-
-        .detail-content {
-            padding: 15px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .detail-box {
-            background: white;
-            padding: 12px;
-            border-radius: 8px;
-            border-left: 3px solid #667eea;
-        }
-
-        .detail-box h4 {
-            font-size: 0.8em;
-            color: #667eea;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .detail-box p, .detail-box ul {
-            font-size: 0.85em;
-            color: #555;
-            line-height: 1.4;
-            margin: 0;
-        }
-
-        .detail-box ul {
-            margin-left: 16px;
-            padding: 0;
-        }
-
-        .detail-box li {
-            margin-bottom: 4px;
-        }
-
-        .detail-full {
-            grid-column: 1 / -1;
-        }
-
-        .warning {
-            background: #fff3cd;
-            border-left-color: #ffc107;
-            margin-top: 12px;
-        }
-
-        .success {
-            background: #d4edda;
-            border-left-color: #28a745;
-        }
-
-        .info-section {
-            display: none;
-            padding: 15px;
-            background: white;
-            border-top: 1px solid #eee;
-        }
-
-        .info-section.active {
-            display: block;
-        }
-
-        .legend {
-            background: white;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-        }
-
-        .legend h3 {
-            font-size: 0.95em;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .legend-item {
-            font-size: 0.8em;
-            color: #666;
-            margin-bottom: 8px;
-        }
-
-        .legend-item strong {
-            color: #333;
-        }
-
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 1.5em;
-            }
-
-            .container {
-                padding: 8px;
-            }
-
-            .plant-card {
-                margin-bottom: 10px;
-            }
-
-            .detail-content {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-        }
-
-        .footer {
-            text-align: center;
-            padding: 20px 15px;
-            color: #999;
-            font-size: 0.8em;
-            margin-top: 20px;
-        }
-    </style>
+@media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
+</style>
 </head>
 <body>
-    <div class="header">
-        <h1>🌱 Mi Jardín</h1>
-        <p>Guía interactiva de plantas</p>
-    </div>
 
-    <div class="tabs" id="tabs"></div>
+<header class="masthead">
+    <h1>Mi Jardín</h1>
+    <p class="sub">Catálogo de plantas de interior · Coyoacán, CDMX</p>
+    <div class="filete"></div>
+</header>
 
-    <div class="container">
-        <div class="legend">
-            <h3>💡 Cómo usar:</h3>
-            <div class="legend-item">✓ Selecciona una zona arriba</div>
-            <div class="legend-item">✓ Toca una planta para ver TODA la información</div>
-            <div class="legend-item">✓ Puedes consultar mientras riegas</div>
-        </div>
+<div class="nav-wrap">
+    <nav class="nav" id="nav" role="tablist" aria-label="Zonas de luz"></nav>
+</div>
 
-        <div id="content"></div>
-    </div>
+<div class="buscador">
+    <label for="q">Buscar</label>
+    <input id="q" type="search" autocomplete="off" placeholder="nombre, especie o rincón…">
+</div>
 
-    <div class="footer">
-        <p>📱 Optimizado para móvil | Consulta siempre que lo necesites</p>
-        <p style="font-size: 0.8em; opacity: .75; margin-top: 6px;">
-            Fotografías de <a href="https://commons.wikimedia.org" target="_blank" rel="noopener" style="color: inherit;">Wikimedia Commons</a>,
-            bajo licencias libres. Ilustraciones propias.
-        </p>
-    </div>
+<main class="hoja" id="hoja"></main>
 
-    <script>
+<footer class="pie">
+    <p>Fotografías de <a href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons</a>, bajo licencias libres. Láminas dibujadas a mano dentro de este archivo.</p>
+    <p>Toca una lámina para abrir fotografías de la especie.</p>
+</footer>
+
+<script>
+
         const plantas = {
             zona1: {
-                titulo: "ZONA 1: Luz Baja + Agua Moderada",
-                gradient: "var(--zona1)",
+                zona: 1,
+                corto: "Luz baja",
+                descripcion: "Luz baja · riego moderado",
                 plantas: [
                     {
                         nombre: "Hoja de Hombre",
                         cientifico: "Philodendron hederaceum",
-                        emoji: "🪴",
                         ubicacion: "Rincón, pasillo",
                         riego: "5-7 días",
                         luz: "Baja",
@@ -445,7 +578,6 @@
                     {
                         nombre: "Anturio",
                         cientifico: "Anthurium andraeanum",
-                        emoji: "🌺",
                         ubicacion: "Rincón, interior",
                         riego: "5-7 días",
                         luz: "Baja-Media",
@@ -462,7 +594,6 @@
                     {
                         nombre: "Diefembaquia Reflectante",
                         cientifico: "Dieffenbachia 'Reflector'",
-                        emoji: "🌿",
                         ubicacion: "Rincón, interior",
                         riego: "5-7 días",
                         luz: "Baja-Media",
@@ -474,18 +605,18 @@
                         reproduccion: "Esquejes de tallo enraízan en agua. Planta en tierra después de 2-3 semanas.",
                         nivelExigencia: "2/10 - Muy tolerante",
                         problemas: "Tallos largos = falta luz | Hojas pálidas = falta nutrientes | Pudrición raíz = exceso agua",
-                        especial: "⚠️ TÓXICA: Evita mascotas y niños. Lava manos. Crece rápido: poda regularmente para forma."
+                        especial: "TÓXICA: Evita mascotas y niños. Lava manos. Crece rápido: poda regularmente para forma."
                     }
                 ]
             },
             zona2: {
-                titulo: "ZONA 2: Luz Media + Agua Moderada",
-                gradient: "var(--zona2)",
+                zona: 2,
+                corto: "Luz media",
+                descripcion: "Luz media · riego moderado",
                 plantas: [
                     {
                         nombre: "Poto Marble Queen",
                         cientifico: "Epipremnum aureum 'Marble Queen'",
-                        emoji: "🪴",
                         ubicacion: "Ventana N/E con cortina",
                         riego: "5-7 días",
                         luz: "Media",
@@ -502,7 +633,6 @@
                     {
                         nombre: "Poto Neón",
                         cientifico: "Epipremnum aureum 'Neon'",
-                        emoji: "💚",
                         ubicacion: "Ventana con luz media-brillante",
                         riego: "5-7 días",
                         luz: "Media-Brillante",
@@ -519,7 +649,6 @@
                     {
                         nombre: "Potos Verde",
                         cientifico: "Epipremnum aureum",
-                        emoji: "🪴",
                         ubicacion: "Cualquier lugar interior",
                         riego: "5-7 días",
                         luz: "Baja-Media",
@@ -536,7 +665,6 @@
                     {
                         nombre: "Begonia Ala de Ángel",
                         cientifico: "Begonia maculata",
-                        emoji: "🌿",
                         ubicacion: "Ventana N/E, luz media",
                         riego: "5-7 días",
                         luz: "Media",
@@ -548,12 +676,11 @@
                         reproduccion: "Esquejes de tallo con 2-3 nudos en sustrato húmedo.",
                         nivelExigencia: "5/10 - Requiere humedad y atención",
                         problemas: "Manchas hojas = agua fría o splash | Botrytis = reduce humedad | Caída flores = cambio temperatura",
-                        especial: "Flores y follaje hermosos. Mantén sustrato uniformemente húmedo pero NO encharcado. Evita frío."
+                        especial: "Flores y follaje hermosos. Mantén sustrato uniformemente húmedo pero NO encharcado. Evita frío. Tóxica: la parte más peligrosa es el tubérculo subterráneo (oxalatos de calcio)."
                     },
                     {
                         nombre: "Philodendron Burle Marx",
                         cientifico: "Philodendron 'Burle Marx'",
-                        emoji: "🪴",
                         ubicacion: "Escritorio, mesa con luz media",
                         riego: "5-7 días",
                         luz: "Media",
@@ -570,7 +697,6 @@
                     {
                         nombre: "Monstera Deliciosa",
                         cientifico: "Monstera deliciosa",
-                        emoji: "🍃",
                         ubicacion: "Ventana con luz media-brillante",
                         riego: "7-10 días",
                         luz: "Media-Brillante",
@@ -587,13 +713,13 @@
                 ]
             },
             zona3: {
-                titulo: "ZONA 3: Luz Media/Alta + Agua Moderada",
-                gradient: "var(--zona3)",
+                zona: 3,
+                corto: "Luz media-alta",
+                descripcion: "Luz media a alta · riego moderado",
                 plantas: [
                     {
                         nombre: "Areca",
                         cientifico: "Dypsis lutescens",
-                        emoji: "🌴",
                         ubicacion: "Ventana este brillante",
                         riego: "7-10 días",
                         luz: "Media-Alta",
@@ -605,12 +731,11 @@
                         reproduccion: "Semillas (lentísimo) o retoños basales cuando grandes.",
                         nivelExigencia: "6/10 - Tropical, requiere continuidad",
                         problemas: "Puntas secas = baja humedad + sales acumuladas | Ácaros: rocía frecuente | Cochinillas: aceite neem",
-                        especial: "PLANTA TROPICAL: requiere continuidad cuidados. No tolera cambios. Crece LENTAMENTE. Tóxica. Puede 2m+."
+                        especial: "PLANTA TROPICAL: requiere continuidad cuidados. No tolera cambios. Crece LENTAMENTE. NO tóxica: la ASPCA la clasifica como segura para perros y gatos. Puede 2m+."
                     },
                     {
                         nombre: "Árbol del Caucho",
                         cientifico: "Ficus elastica",
-                        emoji: "🌳",
                         ubicacion: "Ventana con buena luz",
                         riego: "7-10 días",
                         luz: "Media-Alta (ama luz)",
@@ -627,13 +752,13 @@
                 ]
             },
             zona4: {
-                titulo: "ZONA 4: Luz Baja/Media + Agua Baja (BAJO MANTENIMIENTO)",
-                gradient: "var(--zona4)",
+                zona: 4,
+                corto: "Bajo mantenimiento",
+                descripcion: "Luz baja a media · riego escaso",
                 plantas: [
                     {
                         nombre: "Sansevieria",
                         cientifico: "Sansevieria trifasciata",
-                        emoji: "📏",
                         ubicacion: "Rincón, sin luz directa",
                         riego: "10-14 días",
                         luz: "Muy Baja (tolera oscuridad)",
@@ -645,12 +770,11 @@
                         reproduccion: "Trozos de hoja en arena seca. Enraíza 4-6 semanas. También división de rizomas.",
                         nivelExigencia: "0/10 - PERFECTA PARA PRINCIPIANTES",
                         problemas: "Pudrición blanda = EXCESO AGUA (principal) | Tallos blandos = encharcamiento",
-                        especial: "✅ PERFECTA PARA PRINCIPIANTES Y APARTAMENTOS. Purifica aire (NASA). Tóxica si se ingiere. Crece lentamente. Invierno: casi NO riego. ¡OLVÍDALA!"
+                        especial: "PERFECTA PARA PRINCIPIANTES Y APARTAMENTOS. Purifica aire (NASA). Tóxica si se ingiere. Crece lentamente. Invierno: casi NO riego. ¡OLVÍDALA!"
                     },
                     {
                         nombre: "Cuerno de Alce",
                         cientifico: "Platycerium bifurcatum",
-                        emoji: "🦌",
                         ubicacion: "Pared en tabla de corcho",
                         riego: "10-14 días (rocía)",
                         luz: "Media (no sol directo)",
@@ -667,7 +791,6 @@
                     {
                         nombre: "Planta del Corazón",
                         cientifico: "Hoya kerrii",
-                        emoji: "💕",
                         ubicacion: "Escritorio, estante",
                         riego: "10-14 días",
                         luz: "Baja-Media",
@@ -684,7 +807,6 @@
                     {
                         nombre: "Nopalillo Mal Ojo",
                         cientifico: "Rhipsalis baccifera",
-                        emoji: "🌿",
                         ubicacion: "Colgante en ventana",
                         riego: "10-14 días (rocía)",
                         luz: "Media (tolera sombra)",
@@ -701,7 +823,6 @@
                     {
                         nombre: "Cactus Colgante",
                         cientifico: "Rhipsalis baccifera subsp. horrida",
-                        emoji: "🌺",
                         ubicacion: "Cesto colgante",
                         riego: "10-14 días",
                         luz: "Media-Baja",
@@ -718,13 +839,13 @@
                 ]
             },
             zona5: {
-                titulo: "ZONA 5: Luz Alta + Agua Baja (SUCULENTAS Y SOL)",
-                gradient: "var(--zona5)",
+                zona: 5,
+                corto: "Sol y suculentas",
+                descripcion: "Luz alta · riego escaso",
                 plantas: [
                     {
                         nombre: "Palma de Madagascar",
                         cientifico: "Pachypodium lamerei",
-                        emoji: "🌴",
                         ubicacion: "Ventana sur/oeste",
                         riego: "10-14 días",
                         luz: "SOL DIRECTO",
@@ -736,12 +857,11 @@
                         reproduccion: "Semillas (muy lento) o esquejes tallo en arena seca. Requiere PACIENCIA.",
                         nivelExigencia: "5/10 - Exige drenaje perfecto y sol",
                         problemas: "Pudrición = 99% es por AGUA | Amarillamiento = exceso riego | Crece lento es NORMAL",
-                        especial: "⚠️ RARA TROPICAL. Espinas afiladas: ubicación segura. Crece LENTAMENTE (atractivo). Invierno: casi no riego. 1.5m+. Flores amarillas (raro interior)."
+                        especial: "RARA TROPICAL. Espinas afiladas: ubicación segura. Crece LENTAMENTE (atractivo). Invierno: casi no riego. 1.5m+. Flores amarillas (raro interior)."
                     },
                     {
                         nombre: "Cotyledon Pendens",
                         cientifico: "Cotyledon pendens",
-                        emoji: "🌸",
                         ubicacion: "Canasta colgante",
                         riego: "10-14 días",
                         luz: "SOL DIRECTO",
@@ -758,7 +878,6 @@
                     {
                         nombre: "Zebrina",
                         cientifico: "Tradescantia zebrina",
-                        emoji: "🟣",
                         ubicacion: "Ventana sur/oeste",
                         riego: "7-10 días",
                         luz: "Luz Brillante (sol suave)",
@@ -775,7 +894,6 @@
                     {
                         nombre: "Peperomia",
                         cientifico: "Peperomia obtusifolia",
-                        emoji: "🪴",
                         ubicacion: "Mesa, escritorio con luz",
                         riego: "10-14 días",
                         luz: "Media-Brillante",
@@ -792,7 +910,6 @@
                     {
                         nombre: "Meloncito de Jardín",
                         cientifico: "Peperomia argyreia",
-                        emoji: "🍈",
                         ubicacion: "Ventana con luz brillante",
                         riego: "10-14 días",
                         luz: "Brillante",
@@ -804,12 +921,11 @@
                         reproduccion: "Hojas en sustrato húmedo. Enraíza 4-6 semanas. PACIENCIA.",
                         nivelExigencia: "4/10 - Crece lentamente, requiere atención",
                         problemas: "Vetas pálidas = baja humedad | Tallos débiles = más luz | EXCESO agua = muerte",
-                        especial: "✨ DECORATIVA: hojas parecen melón miniatura (vetas plateadas). Crece MUY LENTAMENTE. Flor roja. De colección: requiere atención consistente."
+                        especial: "DECORATIVA: hojas parecen melón miniatura (vetas plateadas). Crece MUY LENTAMENTE. Flor roja. De colección: requiere atención consistente."
                     },
                     {
                         nombre: "Planta China del Dinero",
                         cientifico: "Pilea peperomioides",
-                        emoji: "🌿",
                         ubicacion: "Ventana con luz brillante",
                         riego: "7-10 días",
                         luz: "Brillante (no directo)",
@@ -821,12 +937,11 @@
                         reproduccion: "Offsetos basales cuando grandes. Enraíza agua 1-2 semanas.",
                         nivelExigencia: "3/10 - Necesita rotación regular",
                         problemas: "Tallos largos = gira cada semana | Caída hojas = cambio ubicación | Pegajosas = plagas",
-                        especial: "✨ DE MODA: hojas redondas adorables. Gira cada 3 días (crece hacia luz). LENTITUD es normal. Flores amarillas. Superstición: prosperidad."
+                        especial: "DE MODA: hojas redondas adorables. Gira cada 3 días (crece hacia luz). LENTITUD es normal. Flores amarillas. Superstición: prosperidad."
                     },
                     {
                         nombre: "Alocasia Frydek",
                         cientifico: "Alocasia micholitziana 'Frydek'",
-                        emoji: "🖤",
                         ubicacion: "Ventana este brillante",
                         riego: "7-10 días",
                         luz: "Brillante (NO directo)",
@@ -838,12 +953,11 @@
                         reproduccion: "Tubérculos cuando múltiples. MUY lento.",
                         nivelExigencia: "6/10 - Exige humedad alta consistente",
                         problemas: "Puntas marrones = baja humedad | Manchas = agua fría | Crece lento es NORMAL",
-                        especial: "🖤 HERMOSA: hojas negras con venas plateadas. Exige HUMEDAD ALTA. CRECE LENTAMENTE. Ideal terrario/baño. Tóxica. Requiere CONSISTENCIA."
+                        especial: "HERMOSA: hojas negras con venas plateadas. Exige HUMEDAD ALTA. CRECE LENTAMENTE. Ideal terrario/baño. Tóxica. Requiere CONSISTENCIA."
                     },
                     {
                         nombre: "Alocasia Macrorrhizos 'Variegata'",
                         cientifico: "Alocasia macrorrhizos 'Variegata'",
-                        emoji: "🌿",
                         ubicacion: "Ventana con buena luz",
                         riego: "7-10 días",
                         luz: "Brillante (indirecta)",
@@ -855,125 +969,185 @@
                         reproduccion: "Tubérculos, división rizomas, esquejes tallo con nudo aéreo.",
                         nivelExigencia: "4/10 - Crece rápido pero exige luz",
                         problemas: "Variegación débil = falta luz/nutrientes | Tallos blandos = humedad + aire pobre",
-                        especial: "✨ ESPECTACULAR: hojas grandes dorado-verde variegadas. Crece RÁPIDO y GRANDE (1.5m+). ESPACIO necesario. Tóxica. Hojas nuevas amarillas → doradas."
+                        especial: "ESPECTACULAR: hojas grandes dorado-verde variegadas. Crece RÁPIDO y GRANDE (1.5m+). ESPACIO necesario. Tóxica. Hojas nuevas amarillas → doradas."
                     }
                 ]
             }
         };
 
-        const tabsContainer = document.getElementById('tabs');
-        const content = document.getElementById('content');
+        /* ===== ICONOGRAFÍA =====
+           Trazo fino dibujado a mano, hereda el color del contexto.
+           Sustituye a los emojis que antes hacían de iconos. */
 
-        // Crear botones de zonas
-        Object.keys(plantas).forEach((zoneKey, index) => {
-            const btn = document.createElement('button');
-            btn.className = `tab-btn zona${index + 1}${index === 0 ? ' active' : ''}`;
-            btn.textContent = `Zona ${index + 1}`;
-            btn.onclick = () => selectZone(zoneKey);
-            tabsContainer.appendChild(btn);
+        const ICONOS = {
+            sustrato: '<path d="M3 9c3-1.6 5-1.6 8 0s5 1.6 8 0M3 15c3-1.6 5-1.6 8 0s5 1.6 8 0"/><circle cx="7" cy="5.5" r=".9"/><circle cx="15" cy="19" r=".9"/>',
+            humedad:  '<path d="M12 3.5c3.2 3.8 5 6.4 5 8.7a5 5 0 0 1-10 0c0-2.3 1.8-4.9 5-8.7Z"/>',
+            temperatura: '<path d="M14 13.8V5a2 2 0 1 0-4 0v8.8a4 4 0 1 0 4 0Z"/><path d="M12 9.5v4.6"/>',
+            poda:     '<circle cx="6.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/><path d="M8.3 15.7 18 4M15.7 15.7 6 4"/>',
+            reproduccion: '<path d="M12 20v-7"/><path d="M12 13c0-3 1.8-5 5-5 0 3.2-2 5-5 5Z"/><path d="M12 15c0-2.6-1.6-4.4-4.4-4.4 0 2.8 1.8 4.4 4.4 4.4Z"/>',
+            exigencia: '<path d="M5 19v-4M12 19V9M19 19V5"/>',
+            problemas: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.6v5"/><circle cx="12" cy="16.1" r=".9" fill="currentColor" stroke="none"/>',
+            cuidado:  '<path d="M6.5 3.5h11v17l-5.5-4-5.5 4v-17Z"/>',
+            lupa:     '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l4.5 4.5"/>',
+            chevron:  '<path d="M5 9l7 7 7-7"/>'
+        };
+
+        function icono(nombre, extra){
+            return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" '
+                 + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"'
+                 + (extra ? ' class="' + extra + '"' : '') + '>' + ICONOS[nombre] + '</svg>';
+        }
+
+
+        /* ===== ÍNDICE DE LA COLECCIÓN =====
+           Cada planta recibe un número de acceso continuo y estable: es el
+           índice del ejemplar dentro de la colección, no su orden de lectura. */
+
+        const ZONAS = Object.keys(plantas);
+        const TODAS = [];
+        ZONAS.forEach(clave => {
+            plantas[clave].plantas.forEach(p => {
+                p._zona = clave;
+                p._n = TODAS.length + 1;
+                const txt = (p.especial || '') + ' ' + (p.problemas || '');
+                p._toxica = /t[óo]xic/i.test(txt) && !/no\s+t[óo]xic/i.test(txt);
+                p._busca = [p.nombre, p.cientifico, p.ubicacion, p.luz, p.dificultad]
+                           .join(' ').toLowerCase();
+                TODAS.push(p);
+            });
         });
 
-        function selectZone(zoneKey) {
-            // Actualizar botones activos
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                if (btn.textContent.includes(Object.keys(plantas).indexOf(zoneKey) + 1)) {
-                    btn.classList.add('active');
-                }
-            });
+        const esc = s => String(s).replace(/[&<>"]/g, c =>
+            ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-            // Generar contenido
-            const zoneData = plantas[zoneKey];
-            content.innerHTML = '';
+        /* Enlace a Google Imágenes: científico + común
+           (el común ayuda cuando el cultivar no es muy conocido) */
+        function urlImagenes(planta){
+            const q = planta.cientifico + ' ' + planta.nombre + ' planta';
+            return 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(q);
+        }
 
-            const zoneTitle = document.createElement('div');
-            zoneTitle.className = 'zone-title active';
-            zoneTitle.style.background = zoneData.gradient;
-            zoneTitle.textContent = zoneData.titulo;
-            content.appendChild(zoneTitle);
+        function campo(icon, titulo, texto, clases){
+            if(!texto) return '';
+            return `<div class="campo ${clases || ''}">
+                ${icono(icon)}
+                <div><h3>${titulo}</h3><p>${esc(texto)}</p></div>
+            </div>`;
+        }
 
-            // Crear cards para cada planta
-            zoneData.plantas.forEach((planta, idx) => {
-                const card = document.createElement('div');
-                const zoneNum = Object.keys(plantas).indexOf(zoneKey) + 1;
-                card.className = `plant-card z${zoneNum}`;
+        function fichaHTML(p){
+            const lamina = ilustracion(p.nombre)
+                || `<span class="sin-lamina">${icono('reproduccion')}</span>`;
+            const acceso = String(p._n).padStart(2, '0');
 
-                card.innerHTML = `
-                    <div class="plant-header">
-                        <div class="plant-info">
-                            <div class="plant-name">${planta.nombre}</div>
-                            <div style="font-size: 0.75em; color: #999; font-style: italic; margin-bottom: 6px;">${planta.cientifico}</div>
-                            <div class="plant-location">📍 ${planta.ubicacion}</div>
-                            <div class="plant-badges">
-                                <div class="badge water">💧 ${planta.riego}</div>
-                                <div class="badge light">☀️ ${planta.luz}</div>
-                                <div class="badge difficulty">📊 ${planta.dificultad}</div>
-                            </div>
-                        </div>
-                        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                            <a class="photo-wrap" data-especie="${planta.cientifico}"
-                               href="${urlImagenes(planta)}" target="_blank" rel="noopener"
-                               title="Ver fotos de ${planta.nombre} en Google Imágenes">
-                                ${ilustracion(planta.nombre) || `<span class="fallback">${planta.emoji}</span>`}
-                                <span class="lupa">🔍</span>
-                            </a>
-                            <a class="btn-fotos" href="${urlImagenes(planta)}" target="_blank" rel="noopener">Ver fotos</a>
-                            <div class="toggle-icon">▼</div>
-                        </div>
+            return `<article class="ficha" data-n="${p._n}">
+                <div class="ficha-top">
+                    <a class="marco" href="${urlImagenes(p)}" target="_blank" rel="noopener"
+                       title="Ver fotografías de ${esc(p.nombre)} en Google Imágenes">
+                        <span class="lienzo photo-wrap" data-especie="${esc(p.cientifico)}">${lamina}</span>
+                        <span class="lupa">${icono('lupa')}</span>
+                    </a>
+                    <button class="resumen" type="button" aria-expanded="false">
+                        <span class="linea-sup">
+                            <span>
+                                <span class="nombre">${esc(p.nombre)}</span>
+                                <span class="binomio">${esc(p.cientifico)}</span>
+                            </span>
+                            <span class="acceso">N.º ${acceso}</span>
+                        </span>
+                        <span class="sitio">${esc(p.ubicacion)}${
+                            p._toxica ? '<span class="sello">Tóxica</span>' : ''}</span>
+                        <span class="etiqueta">
+                            <span><span class="dt">Riego</span><span class="dd">${esc(p.riego)}</span></span>
+                            <span><span class="dt">Luz</span><span class="dd">${esc(p.luz)}</span></span>
+                            <span><span class="dt">Manejo</span><span class="dd">${esc(p.dificultad)}</span></span>
+                        </span>
+                        ${icono('chevron', 'chevron')}
+                    </button>
+                </div>
+                <div class="detalle"><div class="interior">
+                    <div class="campos">
+                        ${campo('sustrato','Sustrato',p.sustrato,'ancho')}
+                        ${campo('humedad','Humedad',p.humedad)}
+                        ${campo('temperatura','Temperatura',p.temperatura)}
+                        ${campo('poda','Poda',p.poda,'ancho')}
+                        ${campo('reproduccion','Reproducción',p.reproduccion,'ancho')}
+                        ${campo('exigencia','Nivel de exigencia',p.nivelExigencia,'ancho')}
+                        ${campo('problemas','Problemas comunes',p.problemas,'ancho aviso')}
+                        ${campo('cuidado','Cuidado especial',p.especial,'ancho')}
                     </div>
-                    <div class="plant-details">
-                        <div class="detail-content">
-                            <div class="detail-box">
-                                <h4>🌍 Sustrato</h4>
-                                <p>${planta.sustrato}</p>
-                            </div>
-                            <div class="detail-box">
-                                <h4>💨 Humedad</h4>
-                                <p>${planta.humedad}</p>
-                            </div>
-                            <div class="detail-box">
-                                <h4>🌡️ Temperatura</h4>
-                                <p>${planta.temperatura}</p>
-                            </div>
-                            <div class="detail-box">
-                                <h4>✂️ Poda</h4>
-                                <p>${planta.poda}</p>
-                            </div>
-                            <div class="detail-box">
-                                <h4>🌱 Reproducción</h4>
-                                <p>${planta.reproduccion}</p>
-                            </div>
-                            <div class="detail-box">
-                                <h4>📊 Nivel Exigencia</h4>
-                                <p>${planta.nivelExigencia}</p>
-                            </div>
-                            <div class="detail-box detail-full warning">
-                                <h4>⚠️ Problemas Comunes</h4>
-                                <p>${planta.problemas}</p>
-                            </div>
-                            <div class="detail-box detail-full success">
-                                <h4>💡 Cuidado Especial</h4>
-                                <p>${planta.especial}</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                </div></div>
+            </article>`;
+        }
 
-                const headerElement = card.querySelector('.plant-header');
-                headerElement.onclick = function(ev) {
-                    // Si tocaron un enlace (ver fotos), no desplegar la ficha
-                    if (ev.target.closest('a')) return;
-                    card.classList.toggle('expanded');
+        function seccionHTML(titulo, descripcion, lista){
+            const n = lista.length;
+            return `<section>
+                <div class="seccion">
+                    <div>
+                        <h2>${esc(titulo)}</h2>
+                        ${descripcion ? `<div class="desc">${esc(descripcion)}</div>` : ''}
+                    </div>
+                    <div class="conteo">${n} ${n === 1 ? 'ejemplar' : 'ejemplares'}</div>
+                </div>
+                ${lista.map(fichaHTML).join('')}
+            </section>`;
+        }
+
+
+        /* ===== ESTADO Y PINTADO ===================================== */
+
+        const nav   = document.getElementById('nav');
+        const hoja  = document.getElementById('hoja');
+        const busca = document.getElementById('q');
+
+        let zonaActiva = ZONAS[0];
+
+        ZONAS.forEach(clave => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.textContent = plantas[clave].corto;
+            b.setAttribute('role', 'tab');
+            b.dataset.zona = clave;
+            b.onclick = () => { busca.value = ''; zonaActiva = clave; pintar(); };
+            nav.appendChild(b);
+        });
+
+        function pintar(){
+            const q = busca.value.trim().toLowerCase();
+
+            nav.querySelectorAll('button').forEach(b =>
+                b.setAttribute('aria-selected', !q && b.dataset.zona === zonaActiva));
+
+            if(q){
+                const hits = TODAS.filter(p => p._busca.includes(q));
+                hoja.innerHTML = hits.length
+                    ? seccionHTML('Resultados', `Coincidencias con “${q}”`, hits)
+                    : `<p class="vacio">Ninguna de las ${TODAS.length} plantas coincide con “${esc(q)}”.</p>`;
+            }else{
+                const z = plantas[zonaActiva];
+                hoja.innerHTML = seccionHTML(z.corto, z.descripcion, z.plantas);
+            }
+
+            hoja.querySelectorAll('.resumen').forEach(btn => {
+                btn.onclick = () => {
+                    const ficha = btn.closest('.ficha');
+                    const abierta = ficha.classList.toggle('abierta');
+                    btn.setAttribute('aria-expanded', abierta);
                 };
-
-                content.appendChild(card);
             });
 
             cargarFotos();
         }
 
+        let tecleo;
+        busca.addEventListener('input', () => {
+            clearTimeout(tecleo);
+            tecleo = setTimeout(pintar, 120);
+        });
 
-        /* ===== ILUSTRACIONES VECTORIALES =====
+
+        /* ===== LÁMINAS VECTORIALES =====
            Dibujadas dentro del archivo. No dependen de internet ni de URLs. */
 
         const ESPECIE = {
@@ -1003,7 +1177,8 @@
             "Alocasia Macrorrhizos 'Variegata'": {f:'flecha',     a:'#3f8a4a', b:'#eaf2e2', c:'#2a6633', v:'marmol'}
         };
 
-        const FONDO = '#eef3ee';
+        const FONDO = '#F4F1E4';   // papel de la lámina; constante en ambos temas
+                                   // (las caladuras de la monstera se recortan con este mismo tono)
 
         function _venas(c){
             return `<path d="M0,-22 L0,17" stroke="${c}" stroke-width="1.6" fill="none" opacity=".5" stroke-linecap="round"/>`;
@@ -1235,11 +1410,10 @@
             const fn = DIBUJOS[e.f];
             if(!fn) return '';
             return `<svg viewBox="0 0 84 84" class="plant-svg" role="img" aria-label="${nombre}">
-                <rect width="84" height="84" rx="12" fill="${FONDO}"/>
+                <rect width="84" height="84" rx="2" fill="${FONDO}"/>
                 ${fn(e)}
             </svg>`;
         }
-
 
         /* ===== FOTOS REALES (capa opcional sobre el dibujo) =====
            Motor v2: usa la Action API de MediaWiki (/w/api.php), que SÍ respeta
@@ -1419,8 +1593,21 @@
             return 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(q);
         }
 
-        // Inicializar con zona 1
-        selectZone('zona1');
+        /* Diagnóstico manual: abrir la consola del navegador (F12) y escribir
+           diagFotos()  -> tabla con la foto encontrada para cada especie. */
+        async function diagFotos(){
+            const filas = [];
+            for(const p of TODAS){
+                let url = null, error = '';
+                try{ url = await buscarFoto(p.cientifico); }catch(err){ error = err.message; }
+                filas.push({ n: p._n, especie: p.cientifico, foto: url ? 'OK' : 'sin foto', url: url || error });
+            }
+            console.table(filas);
+            return filas;
+        }
+        window.diagFotos = diagFotos;
+
+        pintar();
     </script>
 </body>
 </html>
