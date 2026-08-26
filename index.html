@@ -413,6 +413,10 @@
 
     <div class="footer">
         <p>📱 Optimizado para móvil | Consulta siempre que lo necesites</p>
+        <p style="font-size: 0.8em; opacity: .75; margin-top: 6px;">
+            Fotografías de <a href="https://commons.wikimedia.org" target="_blank" rel="noopener" style="color: inherit;">Wikimedia Commons</a>,
+            bajo licencias libres. Ilustraciones propias.
+        </p>
     </div>
 
     <script>
@@ -1238,11 +1242,16 @@
 
 
         /* ===== FOTOS REALES (capa opcional sobre el dibujo) =====
-           Consulta la API de Wikipedia con el nombre científico.
-           Si hay internet y el navegador lo permite, la foto cubre la ilustración.
-           Si falla cualquier cosa, se queda el dibujo. */
+           Motor v2: usa la Action API de MediaWiki (/w/api.php), que SÍ respeta
+           origin=* y devuelve cabeceras CORS. (El endpoint REST
+           /api/rest_v1/page/summary ignora origin=* y falla desde el navegador.)
+           Estrategia por planta:
+             1) prop=pageimages sobre todas las variantes del nombre en una sola
+                petición por wiki (en, luego es), con redirects y normalización.
+             2) Si no hay nada, búsqueda (generator=search) en la misma wiki.
+           Si todo falla, se queda la ilustración SVG. */
 
-        const cacheFotos = {};
+        const cacheFotos = {};   // cientifico -> Promise<string|null>
 
         function variantesNombre(cientifico){
             const v = [];
@@ -1250,33 +1259,118 @@
             push(cientifico.replace(/['\u2018\u2019"]/g,''));
             const sinCultivar = cientifico.replace(/\s*['\u2018\u2019"][^'\u2018\u2019"]*['\u2018\u2019"]\s*/g,' ');
             push(sinCultivar);
-            const partes = sinCultivar.trim().split(/\s+/);
+            const partes = sinCultivar.trim().split(/\s+/).filter(Boolean);
             if(partes.length >= 2) push(partes[0] + ' ' + partes[1]);
-            push(partes[0]);
+            if(partes.length >= 1) push(partes[0]);
             return v;
         }
 
-        async function buscarFoto(cientifico){
+        function apiURL(wiki, params){
+            const p = new URLSearchParams(Object.assign({
+                action: 'query',
+                format: 'json',
+                formatversion: '2',
+                origin: '*'
+            }, params));
+            return 'https://' + wiki + '.wikipedia.org/w/api.php?' + p.toString();
+        }
+
+        async function pedirJSON(url){
+            const r = await fetch(url, { redirect: 'follow' });
+            if(!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        }
+
+        function sacarImagen(pagina){
+            if(!pagina) return null;
+            const t = (pagina.thumbnail && pagina.thumbnail.source)
+                   || (pagina.original  && pagina.original.source);
+            return t || null;
+        }
+
+        /* Devuelve la mejor foto de una wiki respetando el orden de prioridad
+           de las variantes (más específica primero). */
+        async function fotoPorTitulos(wiki, variantes){
+            const orden = {};
+            variantes.forEach((t,i) => { orden[t.toLowerCase()] = i; });
+
+            const d = await pedirJSON(apiURL(wiki, {
+                prop: 'pageimages',
+                piprop: 'thumbnail|original',
+                pithumbsize: '500',
+                pilimit: '50',
+                redirects: '1',
+                titles: variantes.join('|')
+            }));
+            const q = d && d.query;
+            if(!q || !q.pages) return null;
+
+            /* Rastrear normalizaciones y redirecciones para saber a qué
+               variante corresponde cada página devuelta. */
+            const mapa = {};
+            (q.normalized || []).forEach(n => { mapa[n.to.toLowerCase()] = (n.from||'').toLowerCase(); });
+            (q.redirects  || []).forEach(n => { mapa[n.to.toLowerCase()] = (n.from||'').toLowerCase(); });
+            const prioridad = titulo => {
+                let t = (titulo||'').toLowerCase(), saltos = 0;
+                while(saltos++ < 5){
+                    if(t in orden) return orden[t];
+                    if(!(t in mapa)) break;
+                    t = mapa[t];
+                }
+                return 99;
+            };
+
+            let mejor = null, mejorP = 99;
+            q.pages.forEach(p => {
+                if(p.missing) return;
+                const img = sacarImagen(p);
+                if(!img) return;
+                const pr = prioridad(p.title);
+                if(pr < mejorP){ mejorP = pr; mejor = img; }
+            });
+            return mejor;
+        }
+
+        async function fotoPorBusqueda(wiki, consulta){
+            const d = await pedirJSON(apiURL(wiki, {
+                generator: 'search',
+                gsrsearch: consulta,
+                gsrlimit: '3',
+                gsrnamespace: '0',
+                prop: 'pageimages',
+                piprop: 'thumbnail|original',
+                pithumbsize: '500',
+                pilimit: '50'
+            }));
+            const paginas = d && d.query && d.query.pages;
+            if(!paginas) return null;
+            paginas.sort((a,b) => (a.index||99) - (b.index||99));
+            for(const p of paginas){
+                const img = sacarImagen(p);
+                if(img) return img;
+            }
+            return null;
+        }
+
+        function buscarFoto(cientifico){
             if(cientifico in cacheFotos) return cacheFotos[cientifico];
-            for(const nombre of variantesNombre(cientifico)){
+            const variantes = variantesNombre(cientifico);
+            cacheFotos[cientifico] = (async () => {
                 for(const wiki of ['en','es']){
                     try{
-                        const url = 'https://' + wiki + '.wikipedia.org/api/rest_v1/page/summary/'
-                                  + encodeURIComponent(nombre.replace(/ /g,'_')) + '?origin=*';
-                        const r = await fetch(url);
-                        if(!r.ok) continue;
-                        const d = await r.json();
-                        const img = (d.thumbnail && d.thumbnail.source) || (d.originalimage && d.originalimage.source);
-                        if(img){
-                            const grande = img.replace(/\/\d+px-/, '/400px-');
-                            cacheFotos[cientifico] = grande;
-                            return grande;
-                        }
-                    }catch(err){ /* intentar la siguiente variante */ }
+                        const img = await fotoPorTitulos(wiki, variantes);
+                        if(img) return img;
+                    }catch(err){ /* siguiente wiki */ }
                 }
-            }
-            cacheFotos[cientifico] = null;
-            return null;
+                for(const wiki of ['en','es']){
+                    try{
+                        const img = await fotoPorBusqueda(wiki, variantes[variantes.length-1] || cientifico);
+                        if(img) return img;
+                    }catch(err){ /* siguiente wiki */ }
+                }
+                return null;
+            })();
+            return cacheFotos[cientifico];
         }
 
         function cargarFotos(){
@@ -1289,6 +1383,8 @@
                 const img = document.createElement('img');
                 img.className = 'plant-photo';
                 img.alt = wrap.dataset.especie;
+                img.loading = 'lazy';
+                img.decoding = 'async';
                 img.referrerPolicy = 'no-referrer';
                 img.onload = () => img.classList.add('loaded');
                 img.onerror = () => img.remove();
@@ -1296,6 +1392,25 @@
                 wrap.appendChild(img);
             });
         }
+
+        /* Diagnóstico manual: abrir la consola del navegador (F12) y escribir
+           diagFotos()  -> tabla con la foto encontrada para cada especie.
+           Sirve para confirmar que la Action API responde y qué especie falla. */
+        async function diagFotos(){
+            const especies = [...new Set(
+                [...document.querySelectorAll('.photo-wrap[data-especie]')]
+                    .map(w => w.dataset.especie))];
+            const filas = [];
+            for(const e of especies){
+                let url = null, error = '';
+                try{ url = await buscarFoto(e); }catch(err){ error = err.message; }
+                filas.push({ especie: e, foto: url ? 'OK' : 'sin foto', url: url || error });
+            }
+            console.table(filas);
+            return filas;
+        }
+        window.diagFotos = diagFotos;
+
 
         /* Enlace a Google Imágenes: nombre científico + nombre común
            (el común ayuda cuando el cultivar no es muy conocido) */
