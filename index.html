@@ -3,217 +3,249 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="description" content="Catálogo de las 26 plantas de interior de la casa: riego, luz, sustrato, poda y problemas comunes, agrupadas por zona de luz.">
-<meta name="theme-color" content="#E9E5D8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#171611" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Inventario de las plantas de interior de la casa, en Coyoacán: qué es cada una, cada cuándo y cuánta agua se riega, cuánta luz necesita, si es tóxica, y desde cuándo está en casa.">
+<meta name="theme-color" content="#E9E5D8">
 <title>Mi Jardín</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Archivo:wght@400;500;600&family=Courier+Prime:wght@400;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=EB+Garamond:ital,wght@0,500;1,400;1,500&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 <style>
-/* ==========================================================================
-   MI JARDÍN — catálogo de plantas de interior
-   Tratamiento visual: pliego de herbario. Papel de montaje, lámina montada
-   a la izquierda, etiqueta mecanografiada con los datos del espécimen.
-   Paleta: papel/tinta/verde de herbario; el carmín es tinta de sello y solo
-   aparece en advertencias reales (toxicidad, problemas).
-   ========================================================================== */
+/* =======================================================================
+   MI JARDÍN — inventario de plantas de interior
+   Un archivo, sin dependencias ni build. Se consulta desde el celular.
+
+   Orden de este archivo de estilo, y no se altera: tokens, base,
+   estructura, componentes, estados, utilidades, consultas de medios.
+   Una regla nueva va EN SU BLOQUE, nunca al final: añadir al final es
+   lo que encima el código.
+   ===================================================================== */
+
+/* ---------- 1. TOKENS ------------------------------------------------- */
 
 :root{
-    --papel:      #E9E5D8;   /* cartón de montaje */
-    --ficha:      #F4F1E4;   /* pliego del espécimen */
-    --tinta:      #211F19;
-    --tinta-2:    #6E695B;
-    --tinta-3:    #918B79;
-    --verde:      #3F5233;   /* verde de herbario: el acento */
-    --verde-2:    #6B7F55;
-    --carmin:     #8E2B22;   /* tinta de sello: solo advertencias */
-    --linea:      #CBC5B2;
-    --linea-2:    #DDD8C7;
-    --sombra:     0 1px 2px rgba(33,31,25,.05), 0 6px 18px -12px rgba(33,31,25,.22);
+    /* Pliego de herbario: papel, tinta y un solo acento.
+       El carmín está reservado a las advertencias: no adorna. */
+    --papel:    #E9E5D8;
+    --ficha:    #F4F1E4;
+    --tinta:    #211F19;
+    --tinta-2:  #4A4638;
+    --tinta-3:  #6E6857;
+    --linea:    #CFC8B4;
+    --linea-2:  #B9B098;
+    --verde:    #38492D;
+    --carmin:   #8E2B22;
+    --realce:   #DED7C4;
 
-    --serif:  'EB Garamond', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
-    --sans:   'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --mecano: 'Courier Prime', 'Courier New', Courier, monospace;
+    --serif:  "EB Garamond", "Iowan Old Style", Georgia, serif;
+    --sans:   Archivo, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mecano: "Courier Prime", "Courier New", Courier, monospace;
 
-    --ancho: 660px;
+    --cuerpo: 1.0625rem;   /* 17 px: el tamaño mínimo cómodo con la regadera en la mano */
+    --ancho:  46rem;
+    --toque:  44px;        /* área táctil cómoda (la norma pide 24 mínimo) */
 }
 
+/* El tema oscuro sólo redeclara los tokens de color. La lámina NO cambia:
+   su fondo es constante en ambos temas porque las caladuras de la monstera
+   se recortan con ese mismo tono. */
 @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
+    :root:not([data-tema="claro"]){
         --papel:   #171611;
         --ficha:   #201E18;
-        --tinta:   #E9E4D5;
-        --tinta-2: #9A937F;
-        --tinta-3: #7C7663;
-        --verde:   #9CB37E;
-        --verde-2: #7F9464;
-        --carmin:  #D2786C;
-        --linea:   #383527;
-        --linea-2: #2C2A20;
-        --sombra:  0 1px 2px rgba(0,0,0,.35), 0 6px 18px -12px rgba(0,0,0,.7);
+        --tinta:   #EDE8DA;
+        --tinta-2: #C6BFAB;
+        --tinta-3: #9A937F;
+        --linea:   #3A3728;
+        --linea-2: #4E4A37;
+        --verde:   #A8BE8A;
+        --carmin:  #E08C80;
+        --realce:  #2A2820;
     }
 }
-:root[data-theme="dark"]{
+:root[data-tema="oscuro"]{
     --papel:   #171611;
     --ficha:   #201E18;
-    --tinta:   #E9E4D5;
-    --tinta-2: #9A937F;
-    --tinta-3: #7C7663;
-    --verde:   #9CB37E;
-    --verde-2: #7F9464;
-    --carmin:  #D2786C;
-    --linea:   #383527;
-    --linea-2: #2C2A20;
-    --sombra:  0 1px 2px rgba(0,0,0,.35), 0 6px 18px -12px rgba(0,0,0,.7);
+    --tinta:   #EDE8DA;
+    --tinta-2: #C6BFAB;
+    --tinta-3: #9A937F;
+    --linea:   #3A3728;
+    --linea-2: #4E4A37;
+    --verde:   #A8BE8A;
+    --carmin:  #E08C80;
+    --realce:  #2A2820;
 }
 
+/* ---------- 2. BASE --------------------------------------------------- */
+
 *, *::before, *::after{ box-sizing: border-box; }
+
 html{ -webkit-text-size-adjust: 100%; }
+
 body{
     margin: 0;
     background: var(--papel);
     color: var(--tinta);
     font-family: var(--sans);
-    font-size: 16px;
-    line-height: 1.5;
+    font-size: var(--cuerpo);
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
 }
+
+h1, h2, h3{ margin: 0; font-weight: 500; line-height: 1.25; }
+
+button{ font: inherit; color: inherit; }
+
 a{ color: inherit; }
+
 :focus-visible{
     outline: 2px solid var(--verde);
     outline-offset: 2px;
     border-radius: 2px;
 }
 
-/* ---------- Cabecera del pliego ---------------------------------------- */
+.salta{
+    position: absolute; left: -9999px;
+    background: var(--ficha); color: var(--tinta);
+    padding: 12px 16px; z-index: 10;
+}
+.salta:focus{ left: 8px; top: 8px; }
 
-.masthead{
+/* ---------- 3. ESTRUCTURA --------------------------------------------- */
+
+.cabecera{
     max-width: var(--ancho);
     margin: 0 auto;
-    padding: 34px 20px 0;
-}
-.masthead h1{
-    font-family: var(--serif);
-    font-weight: 500;
-    font-size: clamp(1.9rem, 7vw, 2.6rem);
-    letter-spacing: .22em;
-    text-transform: uppercase;
-    text-indent: .22em;
+    padding: 34px 20px 20px;
     text-align: center;
-    margin: 0 0 10px;
-    text-wrap: balance;
 }
-.masthead .sub{
+.cabecera h1{
+    font-family: var(--serif);
+    font-size: 2.1rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+.cabecera p{
+    margin: 10px 0 0;
     font-family: var(--mecano);
-    font-size: .68rem;
+    font-size: .72rem;
     letter-spacing: .14em;
     text-transform: uppercase;
     color: var(--tinta-2);
-    text-align: center;
-    margin: 0 0 16px;
-}
-/* filete doble: grueso + fino, como en las láminas impresas */
-.filete{
-    border-top: 2px solid var(--tinta);
-    border-bottom: 1px solid var(--tinta);
-    height: 4px;
-    opacity: .8;
 }
 
-/* ---------- Navegación por zonas --------------------------------------- */
-
-.nav-wrap{
-    position: relative;
+.barra{
     position: sticky;
     top: 0;
-    z-index: 20;
+    z-index: 5;
     background: var(--papel);
     border-bottom: 1px solid var(--linea);
 }
-.nav{
+
+.navega{
     max-width: var(--ancho);
     margin: 0 auto;
+    padding: 0 12px;
     display: flex;
-    gap: 22px;
+    gap: 2px;
     overflow-x: auto;
-    padding: 12px 20px 0;
     scrollbar-width: none;
 }
-.nav::-webkit-scrollbar{ display: none; }
-/* insinúa que la fila sigue hacia la derecha */
-.nav-wrap::after{
-    content: "";
-    position: absolute;
-    top: 0; right: 0; bottom: 1px;
-    width: 34px;
-    pointer-events: none;
-    background: linear-gradient(to right, transparent, var(--papel));
-}
-@media (min-width: 720px){ .nav-wrap::after{ display: none; } }
-.nav button{
-    appearance: none;
-    background: none;
-    border: 0;
-    border-bottom: 2px solid transparent;
-    padding: 0 0 9px;
-    margin: 0;
-    flex-shrink: 0;
-    cursor: pointer;
-    color: var(--tinta-2);
-    font-family: var(--mecano);
-    font-size: .72rem;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    transition: color .18s ease, border-color .18s ease;
-}
-.nav button:hover{ color: var(--tinta); }
-.nav button[aria-selected="true"]{
-    color: var(--verde);
-    border-bottom-color: var(--verde);
-}
-
-/* ---------- Buscador ---------------------------------------------------- */
+.navega::-webkit-scrollbar{ display: none; }
 
 .buscador{
     max-width: var(--ancho);
     margin: 0 auto;
-    padding: 16px 20px 0;
+    padding: 0 20px;
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 10px;
-    border-bottom: 1px solid var(--linea-2);
+    border-top: 1px solid var(--linea);
 }
-.buscador label{
-    font-family: var(--mecano);
-    font-size: .64rem;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--tinta-3);
-    flex-shrink: 0;
-}
+.buscador svg{ flex: 0 0 auto; color: var(--tinta-3); }
 .buscador input{
     flex: 1;
-    min-width: 0;
-    appearance: none;
+    min-height: var(--toque);
+    border: none;
     background: none;
-    border: 0;
-    padding: 0 0 12px;
-    color: var(--tinta);
-    font-family: var(--mecano);
-    font-size: .88rem;
+    color: inherit;
+    font: inherit;
+    padding: 0;
 }
 .buscador input::placeholder{ color: var(--tinta-3); }
 .buscador input:focus{ outline: none; }
-.buscador:focus-within{ border-bottom-color: var(--verde); }
+.buscador:focus-within svg{ color: var(--verde); }
 
-/* ---------- Orden de la colección --------------------------------------- */
+.hoja{
+    max-width: var(--ancho);
+    margin: 0 auto;
+    padding: 22px 16px 64px;
+}
+
+.encabezado{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 0 4px 14px;
+    border-bottom: 2px solid var(--tinta);
+    margin-bottom: 22px;
+}
+.encabezado h2{
+    font-family: var(--serif);
+    font-size: 1.7rem;
+}
+.encabezado .cuenta{
+    font-family: var(--mecano);
+    font-size: .74rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--tinta-2);
+}
+.encabezado .glosa{
+    flex-basis: 100%;
+    font-size: .95rem;
+    color: var(--tinta-2);
+    margin: 6px 0 0;
+}
+
+.pie{
+    max-width: var(--ancho);
+    margin: 0 auto;
+    padding: 26px 20px 46px;
+    border-top: 1px solid var(--linea);
+    font-size: .88rem;
+    color: var(--tinta-2);
+}
+.pie p{ margin: 0 0 8px; }
+
+/* ---------- 4. COMPONENTES -------------------------------------------- */
+
+/* 4.1 Pestañas y botones de la barra */
+
+.pestana{
+    flex: 0 0 auto;
+    min-height: var(--toque);
+    padding: 0 14px;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    cursor: pointer;
+    color: var(--tinta-2);
+    font-family: var(--mecano);
+    font-size: .76rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.pestana:hover{ color: var(--tinta); }
+
+/* 4.2 Control de orden */
 
 .orden{
     max-width: var(--ancho);
     margin: 0 auto;
-    padding: 13px 20px 0;
+    padding: 10px 16px 0;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -221,343 +253,248 @@ a{ color: inherit; }
 }
 .orden .rotulo{
     font-family: var(--mecano);
-    font-size: .64rem;
-    letter-spacing: .12em;
+    font-size: .7rem;
+    letter-spacing: .1em;
     text-transform: uppercase;
-    color: var(--tinta-3);
-    flex-shrink: 0;
+    color: var(--tinta-2);
 }
-.orden .grupo{ display: flex; gap: 6px; }
 .orden button{
-    appearance: none;
-    background: none;
-    border: 1px solid var(--linea);
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid var(--linea-2);
     border-radius: 2px;
-    padding: 5px 10px;
-    margin: 0;
+    background: none;
     cursor: pointer;
     color: var(--tinta-2);
     font-family: var(--mecano);
-    font-size: .63rem;
-    letter-spacing: .08em;
+    font-size: .72rem;
+    letter-spacing: .06em;
     text-transform: uppercase;
-    transition: color .18s ease, border-color .18s ease;
 }
 .orden button:hover{ color: var(--tinta); border-color: var(--tinta-3); }
-.orden button[aria-pressed="true"]{
-    color: var(--verde);
-    border-color: var(--verde);
-}
 
-/* ---------- Encabezado de sección --------------------------------------- */
-
-.hoja{
-    max-width: var(--ancho);
-    margin: 0 auto;
-    padding: 0 20px 56px;
-}
-.seccion{
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 26px 0 14px;
-}
-.seccion h2{
-    font-family: var(--serif);
-    font-weight: 500;
-    font-size: 1.45rem;
-    margin: 0;
-    line-height: 1.15;
-}
-.seccion .desc{
-    font-family: var(--mecano);
-    font-size: .66rem;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--tinta-2);
-    margin-top: 4px;
-}
-.seccion .conteo{
-    font-family: var(--mecano);
-    font-size: .66rem;
-    letter-spacing: .1em;
-    color: var(--tinta-3);
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
-}
-
-/* ---------- Ficha de espécimen ------------------------------------------ */
+/* 4.3 Ficha */
 
 .ficha{
     background: var(--ficha);
     border: 1px solid var(--linea);
-    box-shadow: var(--sombra);
+    border-radius: 3px;
     margin-bottom: 14px;
-}
-.ficha-top{
-    display: grid;
-    grid-template-columns: 96px 1fr;
-    gap: 16px;
-    padding: 16px;
-    align-items: start;
-}
-
-/* la lámina montada: enlace a fotos reales */
-.marco{
-    position: relative;
-    display: block;
-    width: 96px;
-    height: 96px;
-    padding: 5px;
-    background: #F4F1E4;
-    border: 1px solid var(--linea);
-    text-decoration: none;
-    transition: border-color .18s ease, transform .18s ease;
-}
-.marco:hover{ border-color: var(--verde); }
-.marco:active{ transform: scale(.97); }
-.marco .lienzo{
-    display: block;
-    position: relative;
-    width: 100%;
-    height: 100%;
     overflow: hidden;
 }
-.plant-svg{ width: 100%; height: 100%; display: block; }
-.plant-photo{
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+
+.ficha-alto{
+    display: flex;
+    gap: 14px;
+    padding: 14px;
+    align-items: flex-start;
+}
+
+.lamina{
+    flex: 0 0 92px;
+    width: 92px;
+    height: 92px;
+    position: relative;
+    display: block;
+    border: 1px solid var(--linea);
+    border-radius: 2px;
+    background: #F4F1E4;   /* constante en ambos temas: la lámina es papel */
+    overflow: hidden;
+    text-decoration: none;
+}
+.lamina svg.dibujo{ display: block; width: 100%; height: 100%; }
+.lamina img{
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
     object-fit: cover;
     opacity: 0;
-    transition: opacity .45s ease;
+    transition: opacity .3s ease;
 }
-.plant-photo.loaded{ opacity: 1; }
-.sin-lamina{
-    width: 100%; height: 100%;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--tinta-3);
-}
-/* indicador de que la lámina lleva a fotos */
-.marco .lupa{
+.lamina img.puesta{ opacity: 1; }
+/* La lupa vive sobre la lámina, que es papel en los dos temas: por eso sus
+   tres colores van en duro y no en tokens. Si tomaran los tokens, en el tema
+   oscuro quedarían texto claro sobre papel claro. */
+.lamina .lupa{
     position: absolute;
-    right: 3px;
-    bottom: 3px;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(244,241,228,.94);
-    border: 1px solid var(--linea);
-    color: #3F5233;
+    right: 4px; bottom: 4px;
+    width: 22px; height: 22px;
+    display: grid; place-items: center;
+    background: #F4F1E4;
+    border: 1px solid #CFC8B4;
+    border-radius: 2px;
+    color: #38492D;
 }
-.marco .lupa svg{ width: 11px; height: 11px; }
 
-/* el resumen es el botón que despliega la ficha */
-.resumen{
-    appearance: none;
-    background: none;
-    border: 0;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    text-align: left;
-    color: inherit;
-    font: inherit;
-    cursor: pointer;
-    display: block;
-}
-.linea-sup{
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 10px;
-}
-.linea-sup > span:first-child{ min-width: 0; }
-.acceso{
-    font-family: var(--mecano);
-    font-size: .6rem;
-    letter-spacing: .1em;
-    color: var(--tinta-3);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-}
-.nombre{
-    display: block;
-    font-family: var(--serif);
+.identidad{ flex: 1; min-width: 0; }
+
+.identidad h3{
+    font-size: 1.28rem;
     font-weight: 600;
-    font-size: 1.24rem;
-    line-height: 1.15;
-    margin: 0;
-    text-wrap: balance;
+    letter-spacing: -.01em;
 }
-.binomio{
+.identidad .binomio{
     display: block;
     font-family: var(--serif);
     font-style: italic;
-    font-size: 1rem;
+    font-size: 1.08rem;
     color: var(--tinta-2);
-    margin: 1px 0 0;
+    margin-top: 1px;
 }
-.sitio{
-    display: block;
+.identidad .acceso{
+    float: right;
+    margin-left: 10px;
     font-family: var(--mecano);
-    font-size: .64rem;
-    letter-spacing: .08em;
-    text-transform: uppercase;
+    font-size: .72rem;
     color: var(--tinta-3);
-    margin: 7px 0 0;
 }
-.sello{
-    display: inline-block;
-    margin-left: 9px;
-    padding: 1px 6px;
-    vertical-align: baseline;
-    border: 1px solid var(--carmin);
-    color: var(--carmin);
-    font-family: var(--mecano);
-    font-weight: 700;
-    font-size: .58rem;
-    letter-spacing: .16em;
-    transform: rotate(-1.5deg);
+.identidad .rincon{
+    display: block;
+    margin-top: 7px;
+    font-size: .92rem;
+    color: var(--tinta-2);
 }
 
-/* etiqueta mecanografiada con los tres datos de campo */
-.etiqueta{
+/* 4.4 Marca de toxicidad */
+
+.marca{
+    display: inline-block;
+    margin-top: 9px;
+    padding: 3px 9px;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+    font-family: var(--mecano);
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+}
+.marca-toxica{ color: var(--carmin); }
+.marca-segura{ color: var(--verde); }
+.marca-sindato{ color: var(--tinta-2); }
+
+/* 4.5 Vistazo: los tres datos que se consultan regando */
+
+.vistazo{
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    margin-top: 12px;
-    border-top: 1px solid var(--linea-2);
-}
-.etiqueta > span{
-    padding: 9px 10px 0 0;
-}
-.etiqueta > span + span{
-    border-left: 1px solid var(--linea-2);
-    padding-left: 10px;
-}
-.etiqueta .dt{
-    display: block;
-    font-family: var(--mecano);
-    font-size: .56rem;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--tinta-3);
-    margin: 0 0 2px;
-}
-.etiqueta .dd{
-    display: block;
-    margin: 0;
-    font-size: .84rem;
-    font-weight: 500;
-    line-height: 1.25;
-    font-variant-numeric: tabular-nums;
-}
-
-.chevron{
-    display: block;
-    margin: 12px auto 0;
-    width: 15px;
-    height: 15px;
-    color: var(--tinta-3);
-    transition: transform .28s ease, color .18s ease;
-}
-.ficha.abierta .chevron{ transform: rotate(180deg); color: var(--verde); }
-.resumen:hover .chevron{ color: var(--verde); }
-
-/* ---------- Detalle desplegable ----------------------------------------- */
-
-.detalle{
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows .3s ease;
-}
-.ficha.abierta .detalle{ grid-template-rows: 1fr; }
-.detalle > .interior{ overflow: hidden; }
-
-.campos{
     border-top: 1px solid var(--linea);
-    padding: 4px 16px 16px;
 }
-.campo{
-    display: grid;
-    grid-template-columns: 18px 1fr;
-    gap: 10px;
-    padding: 13px 0;
-    border-bottom: 1px solid var(--linea-2);
+.vistazo > div{
+    padding: 11px 14px;
+    border-left: 1px solid var(--linea);
 }
-.campo:last-child{ border-bottom: 0; }
-.campo svg{
-    width: 16px;
-    height: 16px;
-    margin-top: 2px;
-    color: var(--verde);
-}
-.campo h3{
+.vistazo > div:first-child{ border-left: none; }
+.vistazo dt{
     font-family: var(--mecano);
-    font-size: .6rem;
-    font-weight: 400;
-    letter-spacing: .13em;
+    font-size: .68rem;
+    letter-spacing: .09em;
     text-transform: uppercase;
     color: var(--tinta-2);
-    margin: 0 0 3px;
 }
-.campo p{
-    margin: 0;
-    max-width: 64ch;
-    font-size: .89rem;
-    line-height: 1.5;
-    color: var(--tinta);
-}
-.campo.aviso svg{ color: var(--carmin); }
-.campo.aviso h3{ color: var(--carmin); }
-
-/* en pantallas anchas, los datos cortos van en dos columnas */
-@media (min-width: 620px){
-    .campos{
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        column-gap: 26px;
-    }
-    .campo.ancho{ grid-column: 1 / -1; }
+.vistazo dd{
+    margin: 3px 0 0;
+    font-size: 1rem;
+    line-height: 1.35;
 }
 
-/* ---------- Pie ---------------------------------------------------------- */
+/* 4.6 Botón de apertura */
+
+.abrir{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: var(--toque);
+    border: none;
+    border-top: 1px solid var(--linea);
+    background: none;
+    cursor: pointer;
+    color: var(--tinta-2);
+    font-family: var(--mecano);
+    font-size: .72rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+.abrir:hover{ color: var(--tinta); }
+.abrir svg{ transition: transform .2s ease; }
+
+/* 4.7 Cuerpo desplegable */
+
+.cuerpo{
+    display: none;
+    border-top: 1px solid var(--linea);
+    background: var(--papel);
+}
+
+.campo{
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--linea);
+    display: flex;
+    gap: 12px;
+}
+.campo:last-child{ border-bottom: none; }
+.campo svg{ flex: 0 0 auto; margin-top: 3px; color: var(--tinta-3); }
+.campo .texto{ min-width: 0; }
+.campo dt{
+    font-family: var(--mecano);
+    font-size: .68rem;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--tinta-2);
+}
+.campo dd{ margin: 3px 0 0; }
+.campo-aviso svg{ color: var(--carmin); }
+
+/* 4.8 Barra de exigencia */
+
+.exigencia{ display: flex; align-items: center; gap: 9px; margin-top: 5px; }
+.exigencia .tramos{ display: flex; gap: 3px; }
+.exigencia i{
+    width: 13px; height: 7px;
+    background: var(--linea-2);
+    border-radius: 1px;
+}
+.exigencia i.lleno{ background: var(--verde); }
+.exigencia .cifra{ font-family: var(--mecano); font-size: .82rem; color: var(--tinta-2); }
+
+/* 4.9 Aviso de vacío */
 
 .vacio{
-    font-family: var(--mecano);
-    font-size: .78rem;
+    padding: 32px 4px;
     color: var(--tinta-2);
-    padding: 34px 0;
-    text-align: center;
 }
-.pie{
-    max-width: var(--ancho);
-    margin: 0 auto;
-    padding: 0 20px 44px;
-    border-top: 1px solid var(--linea);
-    padding-top: 18px;
-    font-family: var(--mecano);
-    font-size: .64rem;
-    line-height: 1.7;
-    letter-spacing: .06em;
-    color: var(--tinta-3);
-}
-.pie a{ color: var(--tinta-2); }
 
-@media (max-width: 400px){
-    .masthead{ padding-top: 26px; }
-    .masthead .sub{ font-size: .6rem; letter-spacing: .1em; }
-    .ficha-top{ grid-template-columns: 84px 1fr; gap: 13px; padding: 14px; }
-    .marco{ width: 84px; height: 84px; }
-    .nombre{ font-size: 1.15rem; }
-    .binomio{ font-size: .95rem; }
-    .etiqueta > span{ padding-right: 7px; }
-    .etiqueta > span + span{ padding-left: 7px; }
-    .etiqueta .dd{ font-size: .79rem; }
+/* ---------- 5. ESTADOS ------------------------------------------------ */
+
+.pestana[aria-selected="true"]{
+    color: var(--tinta);
+    border-bottom-color: var(--verde);
+}
+.orden button[aria-pressed="true"]{
+    color: var(--verde);
+    border-color: var(--verde);
+}
+.ficha.abierta .cuerpo{ display: block; }
+.ficha.abierta .abrir svg{ transform: rotate(180deg); }
+
+/* ---------- 6. UTILIDADES --------------------------------------------- */
+
+.solo-lectores{
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* ---------- 7. CONSULTAS DE MEDIOS ------------------------------------ */
+
+@media (min-width: 34rem){
+    .lamina{ flex-basis: 116px; width: 116px; height: 116px; }
+    .identidad h3{ font-size: 1.4rem; }
+    .cabecera h1{ font-size: 2.5rem; }
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -570,833 +507,148 @@ a{ color: inherit; }
 </head>
 <body>
 
-<header class="masthead">
+<a class="salta" href="#hoja">Saltar al listado</a>
+
+<header class="cabecera">
     <h1>Mi Jardín</h1>
-    <p class="sub">Catálogo de plantas de interior · Coyoacán, CDMX</p>
-    <div class="filete"></div>
+    <p>Plantas de interior · Coyoacán, Ciudad de México</p>
 </header>
 
-<div class="nav-wrap">
-    <nav class="nav" id="nav" role="tablist" aria-label="Zonas de luz"></nav>
-</div>
-
-<div class="buscador">
-    <label for="q">Buscar</label>
-    <input id="q" type="search" autocomplete="off" placeholder="nombre, especie o rincón…">
+<div class="barra">
+    <nav class="navega" id="navega" role="tablist" aria-label="Grupos de la colección"></nav>
+    <div class="buscador">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l4.5 4.5" stroke-linecap="round"/></svg>
+        <label class="solo-lectores" for="q">Buscar por nombre, especie, rincón o procedencia</label>
+        <input id="q" type="search" autocomplete="off" placeholder="nombre, especie, rincón…">
+    </div>
 </div>
 
 <div class="orden" id="orden">
-    <span class="rotulo">Orden</span>
-    <div class="grupo" role="group" aria-label="Orden de la colección">
+    <span class="rotulo" id="rotulo-orden">Orden</span>
+    <div role="group" aria-labelledby="rotulo-orden" style="display:flex;gap:6px">
         <button type="button" data-dir="asc"  aria-pressed="true">Antigua → reciente</button>
         <button type="button" data-dir="desc" aria-pressed="false">Reciente → antigua</button>
     </div>
 </div>
 
-<main class="hoja" id="hoja"></main>
+<main class="hoja" id="hoja" tabindex="-1"></main>
+<p class="solo-lectores" id="aviso" aria-live="polite"></p>
 
 <footer class="pie">
-    <p>Fotografías de <a href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons</a>, bajo licencias libres. Láminas dibujadas a mano dentro de este archivo.</p>
-    <p>Toca una lámina para abrir fotografías de la especie.</p>
+    <p>Cada ficha reúne lo que es cierto de la <strong>especie</strong> —cuidados— y lo que es cierto de <strong>tu ejemplar</strong>: cuándo llegó, de dónde y en qué rincón está.</p>
+    <p>La toxicidad se verifica contra la base de plantas tóxicas y no tóxicas de la ASPCA. Cuando una especie no figura ahí, la ficha lo dice en lugar de suponerlo.</p>
+    <p>Toca la lámina para ver fotografías de referencia. Para revisar qué especie encontró fotografía, abre la consola del navegador y escribe <code>diagFotos()</code>.</p>
 </footer>
 
 <script>
+(function(){
+    'use strict';
 
-        const plantas = {
-            zona1: {
-                zona: 1,
-                corto: "Luz baja",
-                descripcion: "Luz baja · riego moderado",
-                plantas: [
-                    {
-                        nombre: "Hoja de Hombre",
-                        cientifico: "Philodendron hederaceum",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Rincón, pasillo",
-                        riego: "5-7 días",
-                        luz: "Baja",
-                        dificultad: "Muy Fácil",
-                        sustrato: "Tierra universal + perlita (40% tierra, 20% perlita, 40% musgo sphagnum)",
-                        humedad: "50-70%",
-                        temperatura: "18-25°C",
-                        poda: "Poda regularmente para mantener forma. Retira hojas amarillas. Puedes podar hasta el suelo - rebrota fácil.",
-                        reproduccion: "Esquejes en agua en primavera-verano. Enraíza en 3-4 semanas. Muy fácil.",
-                        nivelExigencia: "1/10 - Sobrevive en casi cualquier condición",
-                        problemas: "Hojas amarillas = exceso agua | Tallos secos = falta luz | Araña roja: rocía agua",
-                        especial: "Tóxica para mascotas. Gira cada 2 semanas. Soporta poca luz pero crece mejor con luz indirecta."
-                    },
-                    {
-                        nombre: "Anturio",
-                        cientifico: "Anthurium andraeanum",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Rincón, interior",
-                        riego: "5-7 días",
-                        luz: "Baja-Media",
-                        dificultad: "Fácil",
-                        sustrato: "Sustrato para orquídeas (corteza de pino, musgo, carbón). Debe drenar MUY bien.",
-                        humedad: "60-80%",
-                        temperatura: "20-28°C",
-                        poda: "Retira flores marchitas desde la base. No podes tallos activamente. Elimina hojas viejas.",
-                        reproduccion: "Brotes laterales con raíces propias. Trasplanta en primavera.",
-                        nivelExigencia: "4/10 - Requiere humedad consistente",
-                        problemas: "Flores marrones = agua fría o plagas | Sin flores = falta luz/nutrientes | Hojas enrolladas = baja humedad",
-                        especial: "Florece 8+ meses/año. Flores duran semanas. Tóxica: usa guantes. Limpia hojas regularmente."
-                    },
-                    {
-                        nombre: "Diefembaquia Reflectante",
-                        cientifico: "Dieffenbachia 'Reflector'",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Rincón, interior",
-                        riego: "5-7 días",
-                        luz: "Baja-Media",
-                        dificultad: "Fácil",
-                        sustrato: "Tierra universal + perlita. Buen drenaje. Renueva cada 1-2 años.",
-                        humedad: "50-70%",
-                        temperatura: "18-25°C",
-                        poda: "Poda regularmente para mantener compacta. Corta por encima de un nudo. Crece rápido - tolera podas fuertes.",
-                        reproduccion: "Esquejes de tallo enraízan en agua. Planta en tierra después de 2-3 semanas.",
-                        nivelExigencia: "2/10 - Muy tolerante",
-                        problemas: "Tallos largos = falta luz | Hojas pálidas = falta nutrientes | Pudrición raíz = exceso agua",
-                        especial: "TÓXICA: Evita mascotas y niños. Lava manos. Crece rápido: poda regularmente para forma."
-                    }
-                ]
-            },
-            zona2: {
-                zona: 2,
-                corto: "Luz media",
-                descripcion: "Luz media · riego moderado",
-                plantas: [
-                    {
-                        nombre: "Poto Marble Queen",
-                        cientifico: "Epipremnum aureum 'Marble Queen'",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Ventana N/E con cortina",
-                        riego: "5-7 días",
-                        luz: "Media",
-                        dificultad: "Muy Fácil",
-                        sustrato: "Tierra universal + perlita (50/50). Excelente drenaje.",
-                        humedad: "40-60%",
-                        temperatura: "18-25°C",
-                        poda: "Poda regularmente para ramificación. Alarga fácilmente - puedes cortar a cualquier nudo.",
-                        reproduccion: "Esquejes en agua. Enraíza rapidísimo (1-2 semanas).",
-                        nivelExigencia: "1/10 - Casi indestructible",
-                        problemas: "Variegación débil = falta luz | Tallos largos secos = exceso agua",
-                        especial: "Crece lentamente que potos verdes pero es más decorativa. Tóxica. Ideal para enredaderas."
-                    },
-                    {
-                        nombre: "Poto Neón",
-                        cientifico: "Epipremnum aureum 'Neon'",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Ventana con luz media-brillante",
-                        riego: "5-7 días",
-                        luz: "Media-Brillante",
-                        dificultad: "Fácil",
-                        sustrato: "Tierra universal + perlita. Necesita buen drenaje.",
-                        humedad: "40-60%",
-                        temperatura: "18-25°C",
-                        poda: "Poda frecuentemente para mantener forma. Tolera podas agresivas.",
-                        reproduccion: "Esquejes de 15 cm con 2-3 nudos en agua.",
-                        nivelExigencia: "2/10 - Fácil pero requiere más luz",
-                        problemas: "Color amarillento = falta luz | Crece lentamente = requiere más luz | Cochinillas: rocía agua jabonosa",
-                        especial: "Requiere más luz que otros potos para color brillante. Tóxica. Gira regularmente."
-                    },
-                    {
-                        nombre: "Potos Verde",
-                        cientifico: "Epipremnum aureum",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Cualquier lugar interior",
-                        riego: "5-7 días",
-                        luz: "Baja-Media",
-                        dificultad: "Extremadamente Fácil",
-                        sustrato: "Tierra universal. La más tolerante. Crece en CUALQUIER sustrato.",
-                        humedad: "30-60%",
-                        temperatura: "15-28°C",
-                        poda: "Poda agresiva cada 2-3 meses para densidad. Tollera podas al ras.",
-                        reproduccion: "Esquejes en agua o tierra. Enraíza en 1-2 semanas. LA MÁS FÁCIL.",
-                        nivelExigencia: "0/10 - PLANTA MÁS RESISTENTE",
-                        problemas: "MUY POCOS. Crece en cualquier condición (casi).",
-                        especial: "LA PLANTA MÁS RESISTENTE. Ideal para principiantes. Cubre muros. Tóxica. Tolera abandono PROLONGADO."
-                    },
-                    {
-                        nombre: "Begonia Ala de Ángel",
-                        cientifico: "Begonia maculata",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Ventana N/E, luz media",
-                        riego: "5-7 días",
-                        luz: "Media",
-                        dificultad: "Medio",
-                        sustrato: "Tierra + perlita + musgo (40/30/30). Debe drenar bien pero mantener humedad.",
-                        humedad: "60-70%",
-                        temperatura: "18-24°C",
-                        poda: "Poda después de floración. Elimina flores marchitas para más flores. Mantén forma compacta.",
-                        reproduccion: "Esquejes de tallo con 2-3 nudos en sustrato húmedo.",
-                        nivelExigencia: "5/10 - Requiere humedad y atención",
-                        problemas: "Manchas hojas = agua fría o splash | Botrytis = reduce humedad | Caída flores = cambio temperatura",
-                        especial: "Flores y follaje hermosos. Mantén sustrato uniformemente húmedo pero NO encharcado. Evita frío. Tóxica: la parte más peligrosa es el tubérculo subterráneo (oxalatos de calcio)."
-                    },
-                    {
-                        nombre: "Philodendron Burle Marx",
-                        cientifico: "Philodendron 'Burle Marx'",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Escritorio, mesa con luz media",
-                        riego: "5-7 días",
-                        luz: "Media",
-                        dificultad: "Fácil",
-                        sustrato: "Tierra + corteza pino + musgo (40/30/30). Simula hábitat tropical.",
-                        humedad: "50-70%",
-                        temperatura: "18-25°C",
-                        poda: "Poda moderada para densidad. Las raíces aéreas: déjalas o córtalas según prefieras.",
-                        reproduccion: "Esquejes con raíces aéreas enraízan fácilmente en sustrato o agua.",
-                        nivelExigencia: "3/10 - Compacta y tolerante",
-                        problemas: "Hojas pequeñas = falta luz/nutrientes | Raíces aéreas = normal | Amarillamiento = exceso agua",
-                        especial: "Forma compacta, ideal para mesas. Crece LENTAMENTE pero vale. Tóxica. Gira cada 2 semanas."
-                    },
-                    {
-                        nombre: "Monstera Deliciosa",
-                        cientifico: "Monstera deliciosa",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Ventana con luz media-brillante",
-                        riego: "7-10 días",
-                        luz: "Media-Brillante",
-                        dificultad: "Fácil",
-                        sustrato: "Tierra + perlita + corteza (40/30/30). Necesita tutor o epipremio.",
-                        humedad: "50-70%",
-                        temperatura: "18-27°C",
-                        poda: "Poda para controlar tamaño. Corta por encima de un nudo para más brotes.",
-                        reproduccion: "Esquejes con nudo aéreo. Enraíza fácilmente en agua.",
-                        nivelExigencia: "3/10 - Crece bien con luz media",
-                        problemas: "Sin perforaciones = luz insuficiente | Tallos largos desnudos = falta luz | Hojas amarillas = exceso agua",
-                        especial: "CRECE GRANDE: espacio suficiente. Perforaciones llegan con madurez (2-3 años). Tóxica. Tutor recomendado. Puede trepar 2+ metros."
-                    },
-                    {
-                        nombre: "Singonio Batik",
-                        cientifico: "Syngonium podophyllum 'Batik'",
-                        fechaIngreso: "2026-09-12",
-                        procedencia: "Mercado de plantas El Pípila",
-                        ubicacion: "Ventana N/E con cortina, o repisa a 1 m de la ventana",
-                        riego: "5-7 días",
-                        luz: "Media (brillante indirecta si puedes)",
-                        dificultad: "Fácil",
-                        sustrato: "Tierra + perlita + fibra de coco (50/30/20). Aireado pero que retenga algo de humedad.",
-                        humedad: "50-60%",
-                        temperatura: "18-27°C",
-                        poda: "Pinza las puntas cada 2-3 meses para que ramifique. Si la dejas trepar, ponle tutor de musgo y las hojas se vuelven más grandes y lobuladas.",
-                        reproduccion: "Esqueje de tallo con 1-2 nudos, en agua o directo en sustrato. Enraíza en 2-3 semanas: de lo más fácil de la casa.",
-                        nivelExigencia: "3/10 - Perdona el olvido y el exceso",
-                        problemas: "Patrón borroso o casi liso = poca luz, acércala a la ventana | Puntas cafés = agua dura o aire seco | Tallos largos y pelones = le falta luz o poda | Araña roja si el aire está muy seco",
-                        especial: "El dibujo \"batik\" son las venas oscuras sobre lámina clara: sólo se marca con buena luz indirecta, con sol directo se quema. De joven la hoja es una flecha simple; al madurar se parte en lóbulos. Tóxica: la ASPCA clasifica Syngonium podophyllum como tóxica para perros, gatos y caballos por oxalatos de calcio insolubles."
-                    }
-                ]
-            },
-            zona3: {
-                zona: 3,
-                corto: "Luz media-alta",
-                descripcion: "Luz media a alta · riego moderado",
-                plantas: [
-                    {
-                        nombre: "Areca",
-                        cientifico: "Dypsis lutescens",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Ventana este brillante",
-                        riego: "7-10 días",
-                        luz: "Media-Alta",
-                        dificultad: "Medio-Alto",
-                        sustrato: "Tierra + perlita + carbón (50/30/20). Buen drenaje ESENCIAL. Palmeras necesitan aireación.",
-                        humedad: "50-70%",
-                        temperatura: "18-27°C",
-                        poda: "Solo retira frondas muertas/amarillas en la base. NO podes frondas verdes.",
-                        reproduccion: "Semillas (lentísimo) o retoños basales cuando grandes.",
-                        nivelExigencia: "6/10 - Tropical, requiere continuidad",
-                        problemas: "Puntas secas = baja humedad + sales acumuladas | Ácaros: rocía frecuente | Cochinillas: aceite neem",
-                        especial: "PLANTA TROPICAL: requiere continuidad cuidados. No tolera cambios. Crece LENTAMENTE. NO tóxica: la ASPCA la clasifica como segura para perros y gatos. Puede 2m+."
-                    },
-                    {
-                        nombre: "Árbol del Caucho",
-                        cientifico: "Ficus elastica",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Ventana con buena luz",
-                        riego: "7-10 días",
-                        luz: "Media-Alta (ama luz)",
-                        dificultad: "Fácil",
-                        sustrato: "Tierra universal + perlita (60/40). Drenaje muy bueno. Renueva cada 2 años.",
-                        humedad: "40-60%",
-                        temperatura: "18-28°C",
-                        poda: "Poda apical para ramificación. Corta por encima de una rama/nudo lateral.",
-                        reproduccion: "Esquejes de tallo en primavera. Usa hormona de enraizamiento. Enraíza 3-4 semanas.",
-                        nivelExigencia: "3/10 - Tolerante si tiene luz",
-                        problemas: "Caída hojas = cambio ubicación o frío | Cochinillas/escamas: insecticida | Hojas pálidas = falta luz",
-                        especial: "PLANTA GRANDE Y FRONDOSA: espacio (3m+). Ama luz brillante. Tóxica: látex irritante. Gira 1-2 semanas."
-                    },
-                    {
-                        nombre: "Alocasia Longiloba",
-                        cientifico: "Alocasia longiloba",
-                        fechaIngreso: "2026-09-12",
-                        procedencia: "Mercado de plantas El Pípila",
-                        ubicacion: "Ventana este, a 50-80 cm del vidrio. Nunca sol directo de mediodía.",
-                        riego: "7-10 días",
-                        luz: "Brillante indirecta (NO directa)",
-                        dificultad: "Medio-Alto",
-                        sustrato: "Mezcla aroidea: corteza de pino + perlita + fibra de coco (40/30/30). Muy aireada, el cormo se pudre si se queda mojado.",
-                        humedad: "60-80% (el punto débil en Coyoacán)",
-                        temperatura: "18-28°C. Por debajo de 15°C tira hojas.",
-                        poda: "Sólo corta hojas viejas o amarillas al ras del peciolo. No despuntes: cada hoja nace del cormo.",
-                        reproduccion: "División de cormos hijos en primavera, cuando trasplantes. De semilla es impráctico.",
-                        nivelExigencia: "7/10 - Humedad alta y vigilancia de ácaros",
-                        problemas: "Ácaros: es SU plaga, revisa el envés cada semana | Bordes secos y papel = aire seco | Hoja amarilla de golpe = exceso de riego, revisa el cormo | Gotas en las puntas por la mañana = gutación, es normal | Tirar todas las hojas en invierno = latencia, NO la tires",
-                        especial: "Hoja de flecha alargada, verde muy oscuro, con las venas marcadas en gris plata: ése es el rasgo, no lo confundas con la Frydek (aterciopelada) ni con la Macrorrhizos. Súbele la humedad con charola de guijarros o humidificador cerca, no rociándola (el agua parada en la hoja le atrae hongos). Tóxica: la ASPCA clasifica Alocasia spp. como tóxica para perros, gatos y caballos por oxalatos de calcio insolubles."
-                    }
-                ]
-            },
-            zona4: {
-                zona: 4,
-                corto: "Bajo mantenimiento",
-                descripcion: "Luz baja a media · riego escaso",
-                plantas: [
-                    {
-                        nombre: "Sansevieria",
-                        cientifico: "Sansevieria trifasciata",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Rincón, sin luz directa",
-                        riego: "10-14 días",
-                        luz: "Muy Baja (tolera oscuridad)",
-                        dificultad: "Extremadamente Fácil",
-                        sustrato: "Cactáceas + perlita (70/30). Drenaje MÁXIMO: requiere POCO agua.",
-                        humedad: "20-40%",
-                        temperatura: "15-30°C",
-                        poda: "Retira hojas dañadas en la base. Casi no necesita poda.",
-                        reproduccion: "Trozos de hoja en arena seca. Enraíza 4-6 semanas. También división de rizomas.",
-                        nivelExigencia: "0/10 - PERFECTA PARA PRINCIPIANTES",
-                        problemas: "Pudrición blanda = EXCESO AGUA (principal) | Tallos blandos = encharcamiento",
-                        especial: "PERFECTA PARA PRINCIPIANTES Y APARTAMENTOS. Purifica aire (NASA). Tóxica si se ingiere. Crece lentamente. Invierno: casi NO riego. ¡OLVÍDALA!"
-                    },
-                    {
-                        nombre: "Cuerno de Alce",
-                        cientifico: "Platycerium bifurcatum",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Pared en tabla de corcho",
-                        riego: "10-14 días (rocía)",
-                        luz: "Media (no sol directo)",
-                        dificultad: "Medio",
-                        sustrato: "Epífita: corteza pino + musgo sphagnum + carbón. Montaje en tabla corcho o madera.",
-                        humedad: "60-80%",
-                        temperatura: "15-25°C",
-                        poda: "NO podes frondas verdes. Retira hojas base muertas (son protectoras). Limpia polvo.",
-                        reproduccion: "Esporas (difícil) o división cuando tiene offsetos grandes.",
-                        nivelExigencia: "5/10 - Requiere humedad consistente",
-                        problemas: "Frondas secas = baja humedad | Base marrón = normal, protectora | Plagas raras",
-                        especial: "PLANTA DE COLECCIÓN. Requiere humedad CONSISTENTE. Crece en árboles (epífita). ESPECTACULAR en pared. Lento pero gratificante."
-                    },
-                    {
-                        nombre: "Planta del Corazón",
-                        cientifico: "Hoya kerrii",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Escritorio, estante",
-                        riego: "10-14 días",
-                        luz: "Baja-Media",
-                        dificultad: "Muy Fácil",
-                        sustrato: "Suculentas + perlita (60/40). Muy bien drenado. Maceta pequeña.",
-                        humedad: "30-50%",
-                        temperatura: "18-27°C",
-                        poda: "Mínima. Retira flores muertas. Tolera formas variadas - no necesita poda.",
-                        reproduccion: "Hoja entera en sustrato seco. Tarda MESES pero eventualmente forma plantita. PACIENCIA.",
-                        nivelExigencia: "1/10 - Casi no requiere atención",
-                        problemas: "No florece = falta luz o joven | Hojas amarillas = EXCESO agua (principal) | Lenta es normal",
-                        especial: "REGALO PERFECTO. Forma corazón adorable. Florece flores rosadas cuando madura (2-3 años). CRECE LENTAMENTE. Vive años con mínimo cuidado."
-                    },
-                    {
-                        nombre: "Nopalillo Mal Ojo",
-                        cientifico: "Rhipsalis baccifera",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Colgante en ventana",
-                        riego: "10-14 días (rocía)",
-                        luz: "Media (tolera sombra)",
-                        dificultad: "Fácil",
-                        sustrato: "Tropical + perlita (60/40). Epífita: prefiere musgo.",
-                        humedad: "50-70%",
-                        temperatura: "15-25°C",
-                        poda: "Poda leve para ramificación. Corta segmentos dañados.",
-                        reproduccion: "Esquejes 5-10 cm enraízan fácilmente en sustrato húmedo. 2-3 semanas.",
-                        nivelExigencia: "2/10 - Cactus tropical fácil",
-                        problemas: "Brotes secos = baja humedad | Alargamiento = falta luz (tolera sombra) | Cochinillas: neem",
-                        especial: "CACTUS DIFERENTE: no es del desierto. Flores blancas/rosadas. Perfecta para colgante. CRECE RÁPIDO. Frutos rojos comestibles (mora tropical)."
-                    },
-                    {
-                        nombre: "Cactus Colgante",
-                        cientifico: "Rhipsalis baccifera subsp. horrida",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Cesto colgante",
-                        riego: "10-14 días",
-                        luz: "Media-Baja",
-                        dificultad: "Fácil",
-                        sustrato: "Orquídeas + perlita. Epífita tropical. Maceta colgante ideal.",
-                        humedad: "50-70%",
-                        temperatura: "15-25°C",
-                        poda: "Poda suave para forma. Tolera recortes varios.",
-                        reproduccion: "Esquejes 2-3 segmentos enraízan agua o sustrato. MUY FÁCIL.",
-                        nivelExigencia: "2/10 - Muy tolerante",
-                        problemas: "Segmentos flácidos = baja humedad | Pudrición = agua en exceso | Crecimiento lento es normal",
-                        especial: "RARA Y ESPECIAL. Flores delicadas pequeñas. Frutos rosados decorativos. Ideal basket colgante. NO la dejes completamente seca."
-                    }
-                ]
-            },
-            zona5: {
-                zona: 5,
-                corto: "Sol y suculentas",
-                descripcion: "Luz alta · riego escaso",
-                plantas: [
-                    {
-                        nombre: "Palma de Madagascar",
-                        cientifico: "Pachypodium lamerei",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Ventana sur/oeste",
-                        riego: "10-14 días",
-                        luz: "SOL DIRECTO",
-                        dificultad: "Medio-Alto",
-                        sustrato: "Cactáceas + arena gruesa (70/30). DRENAJE MÁXIMO. Maceta con agujeros GRANDES.",
-                        humedad: "20-30%",
-                        temperatura: "20-30°C",
-                        poda: "Retira hojas viejas. NO podes las ramas activamente.",
-                        reproduccion: "Semillas (muy lento) o esquejes tallo en arena seca. Requiere PACIENCIA.",
-                        nivelExigencia: "5/10 - Exige drenaje perfecto y sol",
-                        problemas: "Pudrición = 99% es por AGUA | Amarillamiento = exceso riego | Crece lento es NORMAL",
-                        especial: "RARA TROPICAL. Espinas afiladas: ubicación segura. Crece LENTAMENTE (atractivo). Invierno: casi no riego. 1.5m+. Flores amarillas (raro interior)."
-                    },
-                    {
-                        nombre: "Cotyledon Pendens",
-                        cientifico: "Cotyledon pendens",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Canasta colgante",
-                        riego: "10-14 días",
-                        luz: "SOL DIRECTO",
-                        dificultad: "Muy Fácil",
-                        sustrato: "Cactáceas + perlita (60/40). Maceta colgante con buen drenaje.",
-                        humedad: "10-30%",
-                        temperatura: "15-28°C",
-                        poda: "Retira flores secas. Minimiza poda, es natural y hermosa así.",
-                        reproduccion: "Hojas enteras sobre arena seca. Enraíza 2-3 semanas. MUY FÁCIL.",
-                        nivelExigencia: "1/10 - Suculenta resistente",
-                        problemas: "Hojas suaves = EXCESO agua | Baja luz pierde color dorado | Cochinillas: neem",
-                        especial: "HERMOSA EN CANASTA. Hojas carne dorada/naranja (con sol). Flores tubo rojo/naranja. CRECE RÁPIDO. Perfecta para olvidadiza. Tóxica."
-                    },
-                    {
-                        nombre: "Zebrina",
-                        cientifico: "Tradescantia zebrina",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Ventana sur/oeste",
-                        riego: "7-10 días",
-                        luz: "Luz Brillante (sol suave)",
-                        dificultad: "Muy Fácil",
-                        sustrato: "Tierra + perlita (60/40). Crece rápido en cualquier sustrato.",
-                        humedad: "40-60%",
-                        temperatura: "15-28°C",
-                        poda: "Poda frecuentemente para densidad. Tolera podas agresivas. Ramifica fácilmente.",
-                        reproduccion: "Esquejes en agua. Enraíza en 5-7 días. MÁS FÁCIL IMPOSIBLE.",
-                        nivelExigencia: "1/10 - Muy resistente",
-                        problemas: "Pierde púrpura = falta luz | Tallos largos débiles = poda | Araña roja: rocía agua",
-                        especial: "CRECE RÁPIDO Y VIGOROSAMENTE. Hojas púrpura intenso (con sol). Flores moradas pequeñas. Perfecta propagar regalos. Cubre muros. Tóxica gatos (leve)."
-                    },
-                    {
-                        nombre: "Peperomia",
-                        cientifico: "Peperomia obtusifolia",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Mesa, escritorio con luz",
-                        riego: "10-14 días",
-                        luz: "Media-Brillante",
-                        dificultad: "Fácil",
-                        sustrato: "Tierra + perlita (70/30). Compacta, no necesita mucho volumen.",
-                        humedad: "40-60%",
-                        temperatura: "18-28°C",
-                        poda: "Poda apical para ramificación. Tolera podas frecuentes.",
-                        reproduccion: "Hojas o esquejes tallo enraízan sustrato húmedo. 2-3 semanas.",
-                        nivelExigencia: "2/10 - Compacta y tolerante",
-                        problemas: "Hojas blandas = exceso agua | Tallos desnudos = poda | Cochinilla: inspección mensual",
-                        especial: "COMPACTA Y BONITA. Hojas gruesas acumulan agua - SIN EXCESOS. Ideal escritorio/mesa. Crece LENTAMENTE (ventaja). Flores espigas blancas. Superstición: dinero."
-                    },
-                    {
-                        nombre: "Meloncito de Jardín",
-                        cientifico: "Peperomia argyreia",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Ventana con luz brillante",
-                        riego: "10-14 días",
-                        luz: "Brillante",
-                        dificultad: "Medio",
-                        sustrato: "Tierra + perlita (70/30). Compacta: maceta pequeña suficiente.",
-                        humedad: "50-70%",
-                        temperatura: "18-25°C",
-                        poda: "Mínima. Mantén forma natural.",
-                        reproduccion: "Hojas en sustrato húmedo. Enraíza 4-6 semanas. PACIENCIA.",
-                        nivelExigencia: "4/10 - Crece lentamente, requiere atención",
-                        problemas: "Vetas pálidas = baja humedad | Tallos débiles = más luz | EXCESO agua = muerte",
-                        especial: "DECORATIVA: hojas parecen melón miniatura (vetas plateadas). Crece MUY LENTAMENTE. Flor roja. De colección: requiere atención consistente."
-                    },
-                    {
-                        nombre: "Planta China del Dinero",
-                        cientifico: "Pilea peperomioides",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Ventana con luz brillante",
-                        riego: "7-10 días",
-                        luz: "Brillante (no directo)",
-                        dificultad: "Fácil",
-                        sustrato: "Tierra + perlita (60/40). Drenaje importante.",
-                        humedad: "50-70%",
-                        temperatura: "15-24°C",
-                        poda: "Poda apical para ramificación. Tolera podas.",
-                        reproduccion: "Offsetos basales cuando grandes. Enraíza agua 1-2 semanas.",
-                        nivelExigencia: "3/10 - Necesita rotación regular",
-                        problemas: "Tallos largos = gira cada semana | Caída hojas = cambio ubicación | Pegajosas = plagas",
-                        especial: "DE MODA: hojas redondas adorables. Gira cada 3 días (crece hacia luz). LENTITUD es normal. Flores amarillas. Superstición: prosperidad."
-                    },
-                    {
-                        nombre: "Alocasia Frydek",
-                        cientifico: "Alocasia micholitziana 'Frydek'",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Ventana este brillante",
-                        riego: "7-10 días",
-                        luz: "Brillante (NO directo)",
-                        dificultad: "Medio-Alto",
-                        sustrato: "Tierra + musgo + perlita (50/30/20). Drena pero mantiene algo humedad.",
-                        humedad: "60-80% IDEAL",
-                        temperatura: "20-28°C",
-                        poda: "Solo retira hojas muertas. Minimiza interferencia.",
-                        reproduccion: "Tubérculos cuando múltiples. MUY lento.",
-                        nivelExigencia: "6/10 - Exige humedad alta consistente",
-                        problemas: "Puntas marrones = baja humedad | Manchas = agua fría | Crece lento es NORMAL",
-                        especial: "HERMOSA: hojas negras con venas plateadas. Exige HUMEDAD ALTA. CRECE LENTAMENTE. Ideal terrario/baño. Tóxica. Requiere CONSISTENCIA."
-                    },
-                    {
-                        nombre: "Alocasia Macrorrhizos 'Variegata'",
-                        cientifico: "Alocasia macrorrhizos 'Variegata'",
-                        fechaIngreso: "2026-08-19",
-                        aprox: true,
-                        ubicacion: "Ventana con buena luz",
-                        riego: "7-10 días",
-                        luz: "Brillante (indirecta)",
-                        dificultad: "Medio",
-                        sustrato: "Tierra + perlita + musgo (50/30/20). Crece rápido: trasplanta anualmente.",
-                        humedad: "60-80%",
-                        temperatura: "20-28°C",
-                        poda: "Retira hojas viejas/dañadas. Minimiza poda.",
-                        reproduccion: "Tubérculos, división rizomas, esquejes tallo con nudo aéreo.",
-                        nivelExigencia: "4/10 - Crece rápido pero exige luz",
-                        problemas: "Variegación débil = falta luz/nutrientes | Tallos blandos = humedad + aire pobre",
-                        especial: "ESPECTACULAR: hojas grandes dorado-verde variegadas. Crece RÁPIDO y GRANDE (1.5m+). ESPACIO necesario. Tóxica. Hojas nuevas amarillas → doradas."
-                    }
-                ]
-            }
-        };
+    /* ===== DATOS ==========================================================
+       Una sola fuente de verdad. ESPECIES guarda los cuidados; EJEMPLARES,
+       el inventario de lo que hay en casa. Dos ejemplares de la misma
+       especie comparten ficha de cuidados y conservan su propia fecha,
+       procedencia y rincón. */
 
-        /* ===== ICONOGRAFÍA =====
-           Trazo fino dibujado a mano, hereda el color del contexto.
-           Sustituye a los emojis que antes hacían de iconos. */
+    const DATOS = {"especies":{"philodendron-hederaceum":{"nombre":"Hoja de Hombre","cientifico":"Philodendron hederaceum","luz":"baja","luzDetalle":"Baja","riego":"5-7 días","agua":"Riego profundo hasta que escurra por el fondo; en maceta de 12-15 cm son unos 250-350 ml. Tira el agua del plato.","manejo":"facil","toxicidad":"toxica","toxBinomio":"Philodendron hederaceum","toxPrincipio":"oxalatos de calcio insolubles","toxNota":"","sustrato":"Tierra universal + perlita (40% tierra, 20% perlita, 40% musgo sphagnum)","humedad":"50-70%","temperatura":"18-25°C","poda":"Poda regularmente para mantener forma. Retira hojas amarillas. Puedes podar hasta el suelo - rebrota fácil.","reproduccion":"Esquejes en agua en primavera-verano. Enraíza en 3-4 semanas. Muy fácil.","exigencia":1,"exigenciaNota":"Sobrevive en casi cualquier condición","problemas":"Hojas amarillas = exceso agua | Tallos secos = falta luz | Araña roja: rocía agua","especial":"Gira cada 2 semanas. Soporta poca luz pero crece mejor con luz indirecta.","svg":{"f":"corazon","a":"#3f8f4a","b":"#5cb069","c":"#27632f"}},"anthurium-andraeanum":{"nombre":"Anturio","cientifico":"Anthurium andraeanum","luz":"baja","luzDetalle":"Baja-Media","riego":"5-7 días","agua":"Riego profundo hasta que escurra, pero sin dejar que el cepellón llegue a secarse del todo: 250-350 ml en maceta de 15 cm.","manejo":"facil","toxicidad":"toxica","toxBinomio":"Anthurium scherzeranum","toxPrincipio":"oxalatos de calcio insolubles","toxNota":"Tu ejemplar es A. andraeanum: la ASPCA lista otra especie del mismo género.","sustrato":"Sustrato para orquídeas (corteza de pino, musgo, carbón). Debe drenar MUY bien.","humedad":"60-80%","temperatura":"20-28°C","poda":"Retira flores marchitas desde la base. No podes tallos activamente. Elimina hojas viejas.","reproduccion":"Brotes laterales con raíces propias. Trasplanta en primavera.","exigencia":4,"exigenciaNota":"Requiere humedad consistente","problemas":"Flores marrones = agua fría o plagas | Sin flores = falta luz/nutrientes | Hojas enrolladas = baja humedad","especial":"Florece 8+ meses/año. Flores duran semanas.  Limpia hojas regularmente.","svg":{"f":"anturio","a":"#2f7a3c","b":"#d92b4b","c":"#f2c14e"}},"dieffenbachia-reflector":{"nombre":"Diefembaquia Reflectante","cientifico":"Dieffenbachia 'Reflector'","luz":"baja","luzDetalle":"Baja-Media","riego":"5-7 días","agua":"Riego profundo hasta que escurra por el fondo; en maceta de 12-15 cm son unos 250-350 ml. Tira el agua del plato.","manejo":"facil","toxicidad":"toxica","toxBinomio":"Dieffenbachia","toxPrincipio":"oxalatos de calcio insolubles y enzima proteolítica","toxNota":"","sustrato":"Tierra universal + perlita. Buen drenaje. Renueva cada 1-2 años.","humedad":"50-70%","temperatura":"18-25°C","poda":"Poda regularmente para mantener compacta. Corta por encima de un nudo. Crece rápido - tolera podas fuertes.","reproduccion":"Esquejes de tallo enraízan en agua. Planta en tierra después de 2-3 semanas.","exigencia":2,"exigenciaNota":"Muy tolerante","problemas":"Tallos largos = falta luz | Hojas pálidas = falta nutrientes | Pudrición raíz = exceso agua","especial":"TÓXICA: Evita mascotas y niños. Lava manos. Crece rápido: poda regularmente para forma.","svg":{"f":"moteada","a":"#3d7d3f","b":"#cfe3a8","c":"#2a5a2c"}},"epipremnum-aureum-marble-queen":{"nombre":"Poto Marble Queen","cientifico":"Epipremnum aureum 'Marble Queen'","luz":"media","luzDetalle":"Media","riego":"5-7 días","agua":"Riego profundo hasta que escurra por el fondo; en maceta de 12-15 cm son unos 250-350 ml. Tira el agua del plato.","manejo":"facil","toxicidad":"toxica","toxBinomio":"Epipremnum aureum","toxPrincipio":"oxalatos de calcio insolubles","toxNota":"","sustrato":"Tierra universal + perlita (50/50). Excelente drenaje.","humedad":"40-60%","temperatura":"18-25°C","poda":"Poda regularmente para ramificación. Alarga fácilmente - puedes cortar a cualquier nudo.","reproduccion":"Esquejes en agua. Enraíza rapidísimo (1-2 semanas).","exigencia":1,"exigenciaNota":"Casi indestructible","problemas":"Variegación débil = falta luz | Tallos largos secos = exceso agua","especial":"Crece lentamente que potos verdes pero es más decorativa.  Ideal para enredaderas.","svg":{"f":"corazon","a":"#4e9455","b":"#eef3e4","c":"#2f6636","v":"marmol"}},"epipremnum-aureum-neon":{"nombre":"Poto Neón","cientifico":"Epipremnum aureum 'Neon'","luz":"media","luzDetalle":"Media-Brillante","riego":"5-7 días","agua":"Riego profundo hasta que escurra por el fondo; en maceta de 12-15 cm son unos 250-350 ml. Tira el agua del plato.","manejo":"facil","toxicidad":"toxica","toxBinomio":"Epipremnum aureum","toxPrincipio":"oxalatos de calcio insolubles","toxNota":"","sustrato":"Tierra universal + perlita. Necesita buen drenaje.","humedad":"40-60%","temperatura":"18-25°C","poda":"Poda frecuentemente para mantener forma. Tolera podas agresivas.","reproduccion":"Esquejes de 15 cm con 2-3 nudos en agua.","exigencia":2,"exigenciaNota":"Fácil pero requiere más luz","problemas":"Color amarillento = falta luz | Crece lentamente = requiere más luz | Cochinillas: rocía agua jabonosa","especial":"Requiere más luz que otros potos para color brillante.  Gira regularmente.","svg":{"f":"corazon","a":"#a8cf3f","b":"#c9e460","c":"#7fa62c"}},"epipremnum-aureum":{"nombre":"Potos Verde","cientifico":"Epipremnum aureum","luz":"media","luzDetalle":"Baja-Media","riego":"5-7 días","agua":"Riego profundo hasta que escurra por el fondo; en maceta de 12-15 cm son unos 250-350 ml. Tira el agua del plato.","manejo":"facil","toxicidad":"toxica","toxBinomio":"Epipremnum aureum","toxPrincipio":"oxalatos de calcio insolubles","toxNota":"","sustrato":"Tierra universal. La más tolerante. Crece en CUALQUIER sustrato.","humedad":"30-60%","temperatura":"15-28°C","poda":"Poda agresiva cada 2-3 meses para densidad. Tollera podas al ras.","reproduccion":"Esquejes en agua o tierra. Enraíza en 1-2 semanas. LA MÁS FÁCIL.","exigencia":0,"exigenciaNota":"PLANTA MÁS RESISTENTE","problemas":"MUY POCOS. Crece en cualquier condición (casi).","especial":"LA PLANTA MÁS RESISTENTE. Ideal para principiantes. Cubre muros.  Tolera abandono PROLONGADO.","svg":{"f":"corazon","a":"#42904c","b":"#63b06d","c":"#2a6633"}},"begonia-maculata":{"nombre":"Begonia Ala de Ángel","cientifico":"Begonia maculata","luz":"media","luzDetalle":"Media","riego":"5-7 días","agua":"Riego moderado, unos 150-250 ml en maceta de 12-15 cm: humedece todo el cepellón sin encharcar.","manejo":"medio","toxicidad":"toxica","toxBinomio":"Begonia spp.","toxPrincipio":"oxalatos de calcio solubles","toxNota":"La parte subterránea es la más tóxica.","sustrato":"Tierra + perlita + musgo (40/30/30). Debe drenar bien pero mantener humedad.","humedad":"60-70%","temperatura":"18-24°C","poda":"Poda después de floración. Elimina flores marchitas para más flores. Mantén forma compacta.","reproduccion":"Esquejes de tallo con 2-3 nudos en sustrato húmedo.","exigencia":5,"exigenciaNota":"Requiere humedad y atención","problemas":"Manchas hojas = agua fría o splash | Botrytis = reduce humedad | Caída flores = cambio temperatura","especial":"Flores y follaje hermosos. Mantén sustrato uniformemente húmedo pero NO encharcado. Evita frío.","svg":{"f":"begonia","a":"#2e6b3a","b":"#e8eef0","c":"#9c2f45"}},"philodendron-burle-marx":{"nombre":"Philodendron Burle Marx","cientifico":"Philodendron 'Burle Marx'","luz":"media","luzDetalle":"Media","riego":"5-7 días","agua":"Riego profundo hasta que escurra por el fondo; en maceta de 12-15 cm son unos 250-350 ml. Tira el agua del plato.","manejo":"facil","toxicidad":"toxica","toxBinomio":"Philodendron hederaceum","toxPrincipio":"oxalatos de calcio insolubles","toxNota":"La ASPCA clasifica el género; tu ejemplar es un cultivar.","sustrato":"Tierra + corteza pino + musgo (40/30/30). Simula hábitat tropical.","humedad":"50-70%","temperatura":"18-25°C","poda":"Poda moderada para densidad. Las raíces aéreas: déjalas o córtalas según prefieras.","reproduccion":"Esquejes con raíces aéreas enraízan fácilmente en sustrato o agua.","exigencia":3,"exigenciaNota":"Compacta y tolerante","problemas":"Hojas pequeñas = falta luz/nutrientes | Raíces aéreas = normal | Amarillamiento = exceso agua","especial":"Forma compacta, ideal para mesas. Crece LENTAMENTE pero vale.  Gira cada 2 semanas.","svg":{"f":"flecha","a":"#3c8747","b":"#59a562","c":"#255c2d","esbelta":1}},"monstera-deliciosa":{"nombre":"Monstera Deliciosa","cientifico":"Monstera deliciosa","luz":"media","luzDetalle":"Media-Brillante","riego":"7-10 días","agua":"Riego profundo hasta que escurra por el fondo; en maceta de 12-15 cm son unos 250-350 ml. Tira el agua del plato.","manejo":"facil","toxicidad":"toxica","toxBinomio":"Monstera deliciosa","toxPrincipio":"oxalatos de calcio insolubles","toxNota":"","sustrato":"Tierra + perlita + corteza (40/30/30). Necesita tutor o epipremio.","humedad":"50-70%","temperatura":"18-27°C","poda":"Poda para controlar tamaño. Corta por encima de un nudo para más brotes.","reproduccion":"Esquejes con nudo aéreo. Enraíza fácilmente en agua.","exigencia":3,"exigenciaNota":"Crece bien con luz media","problemas":"Sin perforaciones = luz insuficiente | Tallos largos desnudos = falta luz | Hojas amarillas = exceso agua","especial":"CRECE GRANDE: espacio suficiente. Perforaciones llegan con madurez (2-3 años).  Tutor recomendado. Puede trepar 2+ metros.","svg":{"f":"monstera","a":"#357f42","b":"#4d9a59","c":"#22592c"}},"syngonium-podophyllum-batik":{"nombre":"Singonio Batik","cientifico":"Syngonium podophyllum 'Batik'","luz":"media","luzDetalle":"Media (brillante indirecta si puedes)","riego":"5-7 días","agua":"Riego profundo hasta que escurra por el fondo; en maceta de 12-15 cm son unos 250-350 ml. Tira el agua del plato.","manejo":"facil","toxicidad":"toxica","toxBinomio":"Syngonium podophyllum","toxPrincipio":"oxalatos de calcio insolubles","toxNota":"","sustrato":"Tierra + perlita + fibra de coco (50/30/20). Aireado pero que retenga algo de humedad.","humedad":"50-60%","temperatura":"18-27°C","poda":"Pinza las puntas cada 2-3 meses para que ramifique. Si la dejas trepar, ponle tutor de musgo y las hojas se vuelven más grandes y lobuladas.","reproduccion":"Esqueje de tallo con 1-2 nudos, en agua o directo en sustrato. Enraíza en 2-3 semanas: de lo más fácil de la casa.","exigencia":3,"exigenciaNota":"Perdona el olvido y el exceso","problemas":"Patrón borroso o casi liso = poca luz, acércala a la ventana | Puntas cafés = agua dura o aire seco | Tallos largos y pelones = le falta luz o poda | Araña roja si el aire está muy seco","especial":"El dibujo \"batik\" son las venas oscuras sobre lámina clara: sólo se marca con buena luz indirecta, con sol directo se quema. De joven la hoja es una flecha simple; al madurar se parte en lóbulos.","svg":{"f":"singonio","a":"#8dbd71","b":"#2d5c33","c":"#3f7a45"}},"dypsis-lutescens":{"nombre":"Areca","cientifico":"Dypsis lutescens","luz":"brillante","luzDetalle":"Media-Alta","riego":"7-10 días","agua":"Riego profundo hasta que escurra, pero sin dejar que el cepellón llegue a secarse del todo: 250-350 ml en maceta de 15 cm.","manejo":"medio-alto","toxicidad":"no-toxica","toxBinomio":"Dypsis lutescens","toxPrincipio":"","toxNota":"","sustrato":"Tierra + perlita + carbón (50/30/20). Buen drenaje ESENCIAL. Palmeras necesitan aireación.","humedad":"50-70%","temperatura":"18-27°C","poda":"Solo retira frondas muertas/amarillas en la base. NO podes frondas verdes.","reproduccion":"Semillas (lentísimo) o retoños basales cuando grandes.","exigencia":6,"exigenciaNota":"Tropical, requiere continuidad","problemas":"Puntas secas = baja humedad + sales acumuladas | Ácaros: rocía frecuente | Cochinillas: aceite neem","especial":"PLANTA TROPICAL: requiere continuidad cuidados. No tolera cambios. Crece LENTAMENTE.  Puede 2m+.","svg":{"f":"palma","a":"#57a355","b":"#78bd73","c":"#3d7c3c"}},"ficus-elastica":{"nombre":"Árbol del Caucho","cientifico":"Ficus elastica","luz":"brillante","luzDetalle":"Media-Alta (ama luz)","riego":"7-10 días","agua":"Riego profundo hasta que escurra por el fondo; en maceta de 12-15 cm son unos 250-350 ml. Tira el agua del plato.","manejo":"facil","toxicidad":"toxica","toxBinomio":"Ficus benjamina","toxPrincipio":"ficina y psoraleno","toxNota":"Ficus elastica no figura por su nombre; la ASPCA lista otra Ficus.","sustrato":"Tierra universal + perlita (60/40). Drenaje muy bueno. Renueva cada 2 años.","humedad":"40-60%","temperatura":"18-28°C","poda":"Poda apical para ramificación. Corta por encima de una rama/nudo lateral.","reproduccion":"Esquejes de tallo en primavera. Usa hormona de enraizamiento. Enraíza 3-4 semanas.","exigencia":3,"exigenciaNota":"Tolerante si tiene luz","problemas":"Caída hojas = cambio ubicación o frío | Cochinillas/escamas: insecticida | Hojas pálidas = falta luz","especial":"PLANTA GRANDE Y FRONDOSA: espacio (3m+). Ama luz brillante.  Gira 1-2 semanas.","svg":{"f":"ovalada","a":"#2f5d3a","b":"#436f4a","c":"#8f3b46"}},"alocasia-longiloba":{"nombre":"Alocasia Longiloba","cientifico":"Alocasia longiloba","luz":"brillante","luzDetalle":"Brillante indirecta (NO directa)","riego":"7-10 días","agua":"Riego profundo hasta que escurra, pero sin dejar que el cepellón llegue a secarse del todo: 250-350 ml en maceta de 15 cm.","manejo":"medio-alto","toxicidad":"toxica","toxBinomio":"Alocasia spp.","toxPrincipio":"oxalatos de calcio insolubles","toxNota":"","sustrato":"Mezcla aroidea: corteza de pino + perlita + fibra de coco (40/30/30). Muy aireada, el cormo se pudre si se queda mojado.","humedad":"60-80% (el punto débil en Coyoacán)","temperatura":"18-28°C. Por debajo de 15°C tira hojas.","poda":"Sólo corta hojas viejas o amarillas al ras del peciolo. No despuntes: cada hoja nace del cormo.","reproduccion":"División de cormos hijos en primavera, cuando trasplantes. De semilla es impráctico.","exigencia":7,"exigenciaNota":"Humedad alta y vigilancia de ácaros","problemas":"Ácaros: es SU plaga, revisa el envés cada semana | Bordes secos y papel = aire seco | Hoja amarilla de golpe = exceso de riego, revisa el cormo | Gotas en las puntas por la mañana = gutación, es normal | Tirar todas las hojas en invierno = latencia, NO la tires","especial":"Hoja de flecha alargada, verde muy oscuro, con las venas marcadas en gris plata: ése es el rasgo, no lo confundas con la Frydek (aterciopelada) ni con la Macrorrhizos. Súbele la humedad con charola de guijarros o humidificador cerca, no rociándola (el agua parada en la hoja le atrae hongos).  como","svg":{"f":"longiloba","a":"#22502f","b":"#c5d4c2","c":"#16331d"}},"sansevieria-trifasciata":{"nombre":"Sansevieria","cientifico":"Sansevieria trifasciata","luz":"muy-baja","luzDetalle":"Muy Baja (tolera oscuridad)","riego":"10-14 días","agua":"Empapa hasta que escurra y luego deja secar el sustrato POR COMPLETO. En maceta de 12 cm, 200-300 ml de una sola vez; mejor poco seguido que poquito a diario.","manejo":"facil","toxicidad":"toxica","toxBinomio":"Sansevieria trifasciata","toxPrincipio":"saponinas","toxNota":"","sustrato":"Cactáceas + perlita (70/30). Drenaje MÁXIMO: requiere POCO agua.","humedad":"20-40%","temperatura":"15-30°C","poda":"Retira hojas dañadas en la base. Casi no necesita poda.","reproduccion":"Trozos de hoja en arena seca. Enraíza 4-6 semanas. También división de rizomas.","exigencia":0,"exigenciaNota":"PERFECTA PARA PRINCIPIANTES","problemas":"Pudrición blanda = EXCESO AGUA (principal) | Tallos blandos = encharcamiento","especial":"PERFECTA PARA PRINCIPIANTES Y APARTAMENTOS. Purifica aire (NASA).  Crece lentamente. Invierno: casi NO riego. ¡OLVÍDALA!","svg":{"f":"espada","a":"#3f7a45","b":"#d3b45c","c":"#2b5a30"}},"platycerium-bifurcatum":{"nombre":"Cuerno de Alce","cientifico":"Platycerium bifurcatum","luz":"media","luzDetalle":"Media (no sol directo)","riego":"10-14 días (rocía)","agua":"Sumerge la base o empapa hasta que escurra, y deja secar entre riegos. Rocía el follaje entre riegos en vez de aumentar el volumen.","manejo":"medio","toxicidad":"no-toxica","toxBinomio":"Platycerium bifurcatum","toxPrincipio":"","toxNota":"","sustrato":"Epífita: corteza pino + musgo sphagnum + carbón. Montaje en tabla corcho o madera.","humedad":"60-80%","temperatura":"15-25°C","poda":"NO podes frondas verdes. Retira hojas base muertas (son protectoras). Limpia polvo.","reproduccion":"Esporas (difícil) o división cuando tiene offsetos grandes.","exigencia":5,"exigenciaNota":"Requiere humedad consistente","problemas":"Frondas secas = baja humedad | Base marrón = normal, protectora | Plagas raras","especial":"PLANTA DE COLECCIÓN. Requiere humedad CONSISTENTE. Crece en árboles (epífita). ESPECTACULAR en pared. Lento pero gratificante.","svg":{"f":"cuerno","a":"#5c9455","b":"#7fae74","c":"#a8935e"}},"hoya-kerrii":{"nombre":"Planta del Corazón","cientifico":"Hoya kerrii","luz":"baja","luzDetalle":"Baja-Media","riego":"10-14 días","agua":"Empapa hasta que escurra y luego deja secar el sustrato POR COMPLETO. En maceta de 12 cm, 200-300 ml de una sola vez; mejor poco seguido que poquito a diario.","manejo":"facil","toxicidad":"no-toxica","toxBinomio":"Hoya kerrii","toxPrincipio":"","toxNota":"","sustrato":"Suculentas + perlita (60/40). Muy bien drenado. Maceta pequeña.","humedad":"30-50%","temperatura":"18-27°C","poda":"Mínima. Retira flores muertas. Tolera formas variadas - no necesita poda.","reproduccion":"Hoja entera en sustrato seco. Tarda MESES pero eventualmente forma plantita. PACIENCIA.","exigencia":1,"exigenciaNota":"Casi no requiere atención","problemas":"No florece = falta luz o joven | Hojas amarillas = EXCESO agua (principal) | Lenta es normal","especial":"REGALO PERFECTO. Forma corazón adorable. Florece flores rosadas cuando madura (2-3 años). CRECE LENTAMENTE. Vive años con mínimo cuidado.","svg":{"f":"hoya","a":"#4a9450","b":"#68b06c","c":"#2f6636"}},"rhipsalis-baccifera":{"nombre":"Nopalillo Mal Ojo","cientifico":"Rhipsalis baccifera","luz":"media","luzDetalle":"Media (tolera sombra)","riego":"10-14 días (rocía)","agua":"Sumerge la base o empapa hasta que escurra, y deja secar entre riegos. Rocía el follaje entre riegos en vez de aumentar el volumen.","manejo":"facil","toxicidad":"no-toxica","toxBinomio":"Rhipsalis cassutha","toxPrincipio":"","toxNota":"Sinónimo de R. baccifera, que es tu ejemplar.","sustrato":"Tropical + perlita (60/40). Epífita: prefiere musgo.","humedad":"50-70%","temperatura":"15-25°C","poda":"Poda leve para ramificación. Corta segmentos dañados.","reproduccion":"Esquejes 5-10 cm enraízan fácilmente en sustrato húmedo. 2-3 semanas.","exigencia":2,"exigenciaNota":"Cactus tropical fácil","problemas":"Brotes secos = baja humedad | Alargamiento = falta luz (tolera sombra) | Cochinillas: neem","especial":"CACTUS DIFERENTE: no es del desierto. Flores blancas/rosadas. Perfecta para colgante. CRECE RÁPIDO. Frutos rojos comestibles (mora tropical).","svg":{"f":"colgante","a":"#4d9152","b":"#6cae6f","c":"#356b39"}},"rhipsalis-baccifera-subsp-horrida":{"nombre":"Cactus Colgante","cientifico":"Rhipsalis baccifera subsp. horrida","luz":"baja","luzDetalle":"Media-Baja","riego":"10-14 días","agua":"Empapa hasta que escurra y luego deja secar el sustrato POR COMPLETO. En maceta de 12 cm, 200-300 ml de una sola vez; mejor poco seguido que poquito a diario.","manejo":"facil","toxicidad":"no-toxica","toxBinomio":"Rhipsalis cassutha","toxPrincipio":"","toxNota":"Sinónimo de R. baccifera; tu ejemplar es la subespecie horrida.","sustrato":"Orquídeas + perlita. Epífita tropical. Maceta colgante ideal.","humedad":"50-70%","temperatura":"15-25°C","poda":"Poda suave para forma. Tolera recortes varios.","reproduccion":"Esquejes 2-3 segmentos enraízan agua o sustrato. MUY FÁCIL.","exigencia":2,"exigenciaNota":"Muy tolerante","problemas":"Segmentos flácidos = baja humedad | Pudrición = agua en exceso | Crecimiento lento es normal","especial":"RARA Y ESPECIAL. Flores delicadas pequeñas. Frutos rosados decorativos. Ideal basket colgante. NO la dejes completamente seca.","svg":{"f":"colgante","a":"#2f6b3a","b":"#4a8a52","c":"#1f4d28"}},"pachypodium-lamerei":{"nombre":"Palma de Madagascar","cientifico":"Pachypodium lamerei","luz":"sol-directo","luzDetalle":"SOL DIRECTO","riego":"10-14 días","agua":"Empapa hasta que escurra y luego deja secar el sustrato POR COMPLETO. En maceta de 12 cm, 200-300 ml de una sola vez; mejor poco seguido que poquito a diario.","manejo":"medio-alto","toxicidad":"sin-dato","toxBinomio":"","toxPrincipio":"","toxNota":"Pachypodium no aparece en la base de la ASPCA. Su látex, como el de las apocináceas, es irritante: manéjala con guantes.","sustrato":"Cactáceas + arena gruesa (70/30). DRENAJE MÁXIMO. Maceta con agujeros GRANDES.","humedad":"20-30%","temperatura":"20-30°C","poda":"Retira hojas viejas. NO podes las ramas activamente.","reproduccion":"Semillas (muy lento) o esquejes tallo en arena seca. Requiere PACIENCIA.","exigencia":5,"exigenciaNota":"Exige drenaje perfecto y sol","problemas":"Pudrición = 99% es por AGUA | Amarillamiento = exceso riego | Crece lento es NORMAL","especial":"RARA TROPICAL. Espinas afiladas: ubicación segura. Crece LENTAMENTE (atractivo). Invierno: casi no riego. 1.5m+. Flores amarillas (raro interior).","svg":{"f":"pachypodium","a":"#8a9186","b":"#4f8f4a","c":"#6b7268"}},"cotyledon-pendens":{"nombre":"Cotyledon Pendens","cientifico":"Cotyledon pendens","luz":"sol-directo","luzDetalle":"SOL DIRECTO","riego":"10-14 días","agua":"Empapa hasta que escurra y luego deja secar el sustrato POR COMPLETO. En maceta de 12 cm, 200-300 ml de una sola vez; mejor poco seguido que poquito a diario.","manejo":"facil","toxicidad":"sin-dato","toxBinomio":"","toxPrincipio":"","toxNota":"El género Cotyledon no aparece en la base de la ASPCA. Contiene bufadienólidos, cardiotóxicos documentados en ganado: trátala como no apta para mascotas.","sustrato":"Cactáceas + perlita (60/40). Maceta colgante con buen drenaje.","humedad":"10-30%","temperatura":"15-28°C","poda":"Retira flores secas. Minimiza poda, es natural y hermosa así.","reproduccion":"Hojas enteras sobre arena seca. Enraíza 2-3 semanas. MUY FÁCIL.","exigencia":1,"exigenciaNota":"Suculenta resistente","problemas":"Hojas suaves = EXCESO agua | Baja luz pierde color dorado | Cochinillas: neem","especial":"HERMOSA EN CANASTA. Hojas carne dorada/naranja (con sol). Flores tubo rojo/naranja. CRECE RÁPIDO. Perfecta para olvidadiza.","svg":{"f":"suculenta","a":"#6f9c7a","b":"#93b79b","c":"#c96b8e"}},"tradescantia-zebrina":{"nombre":"Zebrina","cientifico":"Tradescantia zebrina","luz":"brillante","luzDetalle":"Luz Brillante (sol suave)","riego":"7-10 días","agua":"Riego moderado, unos 150-250 ml en maceta de 12-15 cm: humedece todo el cepellón sin encharcar.","manejo":"facil","toxicidad":"toxica","toxBinomio":"Tradescantia fluminensis","toxPrincipio":"provoca dermatitis","toxNota":"T. zebrina no figura por su nombre; la ASPCA lista otra del mismo género.","sustrato":"Tierra + perlita (60/40). Crece rápido en cualquier sustrato.","humedad":"40-60%","temperatura":"15-28°C","poda":"Poda frecuentemente para densidad. Tolera podas agresivas. Ramifica fácilmente.","reproduccion":"Esquejes en agua. Enraíza en 5-7 días. MÁS FÁCIL IMPOSIBLE.","exigencia":1,"exigenciaNota":"Muy resistente","problemas":"Pierde púrpura = falta luz | Tallos largos débiles = poda | Araña roja: rocía agua","especial":"CRECE RÁPIDO Y VIGOROSAMENTE. Hojas púrpura intenso (con sol). Flores moradas pequeñas. Perfecta propagar regalos. Cubre muros.","svg":{"f":"rayada","a":"#6b4a8c","b":"#c9c3d6","c":"#8f5fa8"}},"peperomia-obtusifolia":{"nombre":"Peperomia","cientifico":"Peperomia obtusifolia","luz":"brillante","luzDetalle":"Media-Brillante","riego":"10-14 días","agua":"Empapa hasta que escurra y luego deja secar el sustrato POR COMPLETO. En maceta de 12 cm, 200-300 ml de una sola vez; mejor poco seguido que poquito a diario.","manejo":"facil","toxicidad":"no-toxica","toxBinomio":"Peperomia obtusifolia","toxPrincipio":"","toxNota":"","sustrato":"Tierra + perlita (70/30). Compacta, no necesita mucho volumen.","humedad":"40-60%","temperatura":"18-28°C","poda":"Poda apical para ramificación. Tolera podas frecuentes.","reproduccion":"Hojas o esquejes tallo enraízan sustrato húmedo. 2-3 semanas.","exigencia":2,"exigenciaNota":"Compacta y tolerante","problemas":"Hojas blandas = exceso agua | Tallos desnudos = poda | Cochinilla: inspección mensual","especial":"COMPACTA Y BONITA. Hojas gruesas acumulan agua - SIN EXCESOS. Ideal escritorio/mesa. Crece LENTAMENTE (ventaja). Flores espigas blancas. Superstición: dinero.","svg":{"f":"ovalada","a":"#48925a","b":"#66ab74","c":"#2f6b3d"}},"peperomia-argyreia":{"nombre":"Meloncito de Jardín","cientifico":"Peperomia argyreia","luz":"brillante","luzDetalle":"Brillante","riego":"10-14 días","agua":"Empapa hasta que escurra y luego deja secar el sustrato POR COMPLETO. En maceta de 12 cm, 200-300 ml de una sola vez; mejor poco seguido que poquito a diario.","manejo":"medio","toxicidad":"no-toxica","toxBinomio":"Peperomia argyreia","toxPrincipio":"","toxNota":"","sustrato":"Tierra + perlita (70/30). Compacta: maceta pequeña suficiente.","humedad":"50-70%","temperatura":"18-25°C","poda":"Mínima. Mantén forma natural.","reproduccion":"Hojas en sustrato húmedo. Enraíza 4-6 semanas. PACIENCIA.","exigencia":4,"exigenciaNota":"Crece lentamente, requiere atención","problemas":"Vetas pálidas = baja humedad | Tallos débiles = más luz | EXCESO agua = muerte","especial":"DECORATIVA: hojas parecen melón miniatura (vetas plateadas). Crece MUY LENTAMENTE. Flor roja. De colección: requiere atención consistente.","svg":{"f":"sandia","a":"#2f6b45","b":"#cfd9c4","c":"#8c3f4a"}},"pilea-peperomioides":{"nombre":"Planta China del Dinero","cientifico":"Pilea peperomioides","luz":"brillante","luzDetalle":"Brillante (no directo)","riego":"7-10 días","agua":"Riego moderado, unos 150-250 ml en maceta de 12-15 cm: humedece todo el cepellón sin encharcar.","manejo":"facil","toxicidad":"sin-dato","toxBinomio":"","toxPrincipio":"","toxNota":"Pilea peperomioides no aparece en la base de la ASPCA, aunque las otras Pilea que sí figuran son no tóxicas.","sustrato":"Tierra + perlita (60/40). Drenaje importante.","humedad":"50-70%","temperatura":"15-24°C","poda":"Poda apical para ramificación. Tolera podas.","reproduccion":"Offsetos basales cuando grandes. Enraíza agua 1-2 semanas.","exigencia":3,"exigenciaNota":"Necesita rotación regular","problemas":"Tallos largos = gira cada semana | Caída hojas = cambio ubicación | Pegajosas = plagas","especial":"DE MODA: hojas redondas adorables. Gira cada 3 días (crece hacia luz). LENTITUD es normal. Flores amarillas. Superstición: prosperidad.","svg":{"f":"moneda","a":"#4f9c58","b":"#6fb877","c":"#3a7a42"}},"alocasia-micholitziana-frydek":{"nombre":"Alocasia Frydek","cientifico":"Alocasia micholitziana 'Frydek'","luz":"brillante","luzDetalle":"Brillante (NO directo)","riego":"7-10 días","agua":"Riego profundo hasta que escurra, pero sin dejar que el cepellón llegue a secarse del todo: 250-350 ml en maceta de 15 cm.","manejo":"medio-alto","toxicidad":"toxica","toxBinomio":"Alocasia spp.","toxPrincipio":"oxalatos de calcio insolubles","toxNota":"","sustrato":"Tierra + musgo + perlita (50/30/20). Drena pero mantiene algo humedad.","humedad":"60-80% IDEAL","temperatura":"20-28°C","poda":"Solo retira hojas muertas. Minimiza interferencia.","reproduccion":"Tubérculos cuando múltiples. MUY lento.","exigencia":6,"exigenciaNota":"Exige humedad alta consistente","problemas":"Puntas marrones = baja humedad | Manchas = agua fría | Crece lento es NORMAL","especial":"HERMOSA: hojas negras con venas plateadas. Exige HUMEDAD ALTA. CRECE LENTAMENTE. Ideal terrario/baño.  Requiere CONSISTENCIA.","svg":{"f":"flecha","a":"#1f4d2c","b":"#8fc79a","c":"#143a1f"}},"alocasia-macrorrhizos-variegata":{"nombre":"Alocasia Macrorrhizos 'Variegata'","cientifico":"Alocasia macrorrhizos 'Variegata'","luz":"brillante","luzDetalle":"Brillante (indirecta)","riego":"7-10 días","agua":"Riego profundo hasta que escurra, pero sin dejar que el cepellón llegue a secarse del todo: 250-350 ml en maceta de 15 cm.","manejo":"medio","toxicidad":"toxica","toxBinomio":"Alocasia spp.","toxPrincipio":"oxalatos de calcio insolubles","toxNota":"","sustrato":"Tierra + perlita + musgo (50/30/20). Crece rápido: trasplanta anualmente.","humedad":"60-80%","temperatura":"20-28°C","poda":"Retira hojas viejas/dañadas. Minimiza poda.","reproduccion":"Tubérculos, división rizomas, esquejes tallo con nudo aéreo.","exigencia":4,"exigenciaNota":"Crece rápido pero exige luz","problemas":"Variegación débil = falta luz/nutrientes | Tallos blandos = humedad + aire pobre","especial":"ESPECTACULAR: hojas grandes dorado-verde variegadas. Crece RÁPIDO y GRANDE (1.5m+). ESPACIO necesario.  Hojas nuevas amarillas → doradas.","svg":{"f":"flecha","a":"#3f8a4a","b":"#eaf2e2","c":"#2a6633","v":"marmol"}}},"ejemplares":[{"clave":"philodendron-hederaceum","n":1,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"anthurium-andraeanum","n":2,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"dieffenbachia-reflector","n":3,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"epipremnum-aureum-marble-queen","n":4,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"epipremnum-aureum-neon","n":5,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"epipremnum-aureum","n":6,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"begonia-maculata","n":7,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"philodendron-burle-marx","n":8,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"monstera-deliciosa","n":9,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"syngonium-podophyllum-batik","n":10,"fechaIngreso":"2026-09-12","aprox":false,"procedencia":"Mercado de plantas El Pípila","rincon":"","foto":"","notas":""},{"clave":"dypsis-lutescens","n":11,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"ficus-elastica","n":12,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"alocasia-longiloba","n":13,"fechaIngreso":"2026-09-12","aprox":false,"procedencia":"Mercado de plantas El Pípila","rincon":"","foto":"","notas":""},{"clave":"sansevieria-trifasciata","n":14,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"platycerium-bifurcatum","n":15,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"hoya-kerrii","n":16,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"rhipsalis-baccifera","n":17,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"rhipsalis-baccifera-subsp-horrida","n":18,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"pachypodium-lamerei","n":19,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"cotyledon-pendens","n":20,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"tradescantia-zebrina","n":21,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"peperomia-obtusifolia","n":22,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"peperomia-argyreia","n":23,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"pilea-peperomioides","n":24,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"alocasia-micholitziana-frydek","n":25,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""},{"clave":"alocasia-macrorrhizos-variegata","n":26,"fechaIngreso":"2026-08-19","aprox":true,"procedencia":"","rincon":"","foto":"","notas":""}]};
+    const ESPECIES = DATOS.especies;
+    const EJEMPLARES = DATOS.ejemplares;
 
-        const ICONOS = {
-            sustrato: '<path d="M3 9c3-1.6 5-1.6 8 0s5 1.6 8 0M3 15c3-1.6 5-1.6 8 0s5 1.6 8 0"/><circle cx="7" cy="5.5" r=".9"/><circle cx="15" cy="19" r=".9"/>',
-            humedad:  '<path d="M12 3.5c3.2 3.8 5 6.4 5 8.7a5 5 0 0 1-10 0c0-2.3 1.8-4.9 5-8.7Z"/>',
-            temperatura: '<path d="M14 13.8V5a2 2 0 1 0-4 0v8.8a4 4 0 1 0 4 0Z"/><path d="M12 9.5v4.6"/>',
-            poda:     '<circle cx="6.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/><path d="M8.3 15.7 18 4M15.7 15.7 6 4"/>',
-            reproduccion: '<path d="M12 20v-7"/><path d="M12 13c0-3 1.8-5 5-5 0 3.2-2 5-5 5Z"/><path d="M12 15c0-2.6-1.6-4.4-4.4-4.4 0 2.8 1.8 4.4 4.4 4.4Z"/>',
-            exigencia: '<path d="M5 19v-4M12 19V9M19 19V5"/>',
-            problemas: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.6v5"/><circle cx="12" cy="16.1" r=".9" fill="currentColor" stroke="none"/>',
-            cuidado:  '<path d="M6.5 3.5h11v17l-5.5-4-5.5 4v-17Z"/>',
-            lupa:     '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l4.5 4.5"/>',
-            chevron:  '<path d="M5 9l7 7 7-7"/>',
-            calendario: '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3.5v3M16 3.5v3"/>',
-            procedencia: '<path d="M11.4 3.5H20v8.6l-8.4 8.4a1.7 1.7 0 0 1-2.4 0l-6.2-6.2a1.7 1.7 0 0 1 0-2.4Z"/><circle cx="16" cy="8" r="1.3"/>',
-            rincon:     '<path d="M4 10.4 12 3.8l8 6.6V20.2H4Z"/><path d="M9.4 20.2v-6.1h5.2v6.1"/>',
-            llegada:    '<rect x="2.5" y="8.6" width="19" height="6.8" rx="1.5"/><path d="M7 8.6v3M12 8.6v4M17 8.6v3"/>'
-        };
+    /* Catálogo de luz: son los grupos, y su orden es el de la navegación. */
+    const LUZ = [
+        { clave:'muy-baja',    corto:'Muy poca luz',  titulo:'Muy poca luz',
+          glosa:'Rincones sin ventana cerca. Toleran la penumbra.' },
+        { clave:'baja',        corto:'Luz baja',      titulo:'Luz baja',
+          glosa:'Lejos de la ventana o con ella tapada. Nada de sol directo.' },
+        { clave:'media',       corto:'Luz media',     titulo:'Luz media',
+          glosa:'Cerca de una ventana norte o este, o detrás de una cortina.' },
+        { clave:'brillante',   corto:'Luz brillante', titulo:'Luz brillante indirecta',
+          glosa:'Junto a la ventana, con claridad todo el día pero sin sol encima.' },
+        { clave:'sol-directo', corto:'Sol directo',   titulo:'Sol directo',
+          glosa:'Ventana sur u oeste, con horas de sol sobre la hoja.' }
+    ];
 
-        function icono(nombre, extra){
-            return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" '
-                 + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"'
-                 + (extra ? ' class="' + extra + '"' : '') + '>' + ICONOS[nombre] + '</svg>';
-        }
+    const MANEJO = { 'facil':'Fácil', 'medio':'Medio', 'medio-alto':'Medio-alto', 'alto':'Alto' };
 
+    const TOXICIDAD = {
+        'toxica':    { etiqueta:'Tóxica',      clase:'marca-toxica',  rotulo:'Toxicidad' },
+        'no-toxica': { etiqueta:'No tóxica',   clase:'marca-segura',  rotulo:'Toxicidad' },
+        'sin-dato':  { etiqueta:'Sin dato',    clase:'marca-sindato', rotulo:'Toxicidad' }
+    };
 
-        /* ===== ÍNDICE DE LA COLECCIÓN =====
-           Cada planta recibe un número de acceso continuo y estable: es el
-           índice del ejemplar dentro de la colección, no su orden de lectura. */
+    const RECIENTES = 'recientes';
 
-        const ZONAS = Object.keys(plantas);
-        const TODAS = [];
-        ZONAS.forEach(clave => {
-            plantas[clave].plantas.forEach(p => {
-                p._zona = clave;
-                p._n = TODAS.length + 1;
-                p._fecha = p.fechaIngreso || '';
-                const txt = (p.especial || '') + ' ' + (p.problemas || '');
-                p._toxica = /t[óo]xic/i.test(txt) && !/no\s+t[óo]xic/i.test(txt);
-                p._busca = [p.nombre, p.cientifico, p.ubicacion, p.luz, p.dificultad,
-                            p.rincon, p.procedencia]
-                           .filter(Boolean).join(' ').toLowerCase();
-                TODAS.push(p);
-            });
+    /* ===== ÍNDICE =========================================================
+       Cada ejemplar se resuelve una vez contra su especie. El número de
+       acceso es estable: identifica al ejemplar, no su orden de lectura. */
+
+    const TODOS = EJEMPLARES.map(function(ej){
+        const es = ESPECIES[ej.clave];
+        if(!es) throw new Error('Ejemplar ' + ej.n + ' apunta a una especie que no existe: ' + ej.clave);
+        const busca = [es.nombre, es.cientifico, es.luzDetalle, MANEJO[es.manejo],
+                       ej.rincon, ej.procedencia, TOXICIDAD[es.toxicidad].etiqueta]
+                      .filter(Boolean).join(' ').toLowerCase();
+        return Object.assign({}, ej, { es: es, _busca: busca });
+    });
+
+    const esc = function(s){
+        return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){
+            return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c];
         });
+    };
 
-        const esc = s => String(s).replace(/[&<>"]/g, c =>
-            ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    /* ===== FECHAS =========================================================
+       La cadena se parte a mano: new Date('2026-09-12') se interpreta en UTC
+       y en la Ciudad de México adelanta un día. Con aprox la fecha es una
+       estimación y se muestra al mes, para no fingir una precisión que no
+       existe; el orden sí usa la fecha completa. */
 
-        /* Enlace a Google Imágenes: científico + común
-           (el común ayuda cuando el cultivar no es muy conocido) */
-        function urlImagenes(planta){
-            const q = planta.cientifico + ' ' + planta.nombre + ' planta';
-            return 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(q);
-        }
+    const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio',
+                   'agosto','septiembre','octubre','noviembre','diciembre'];
 
-        const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio',
-                       'agosto','septiembre','octubre','noviembre','diciembre'];
+    function fechaLarga(iso, aprox){
+        if(!iso) return '';
+        const p = String(iso).split('-').map(Number);
+        const a = p[0], m = p[1], d = p[2];
+        if(!a || !m || !d || m < 1 || m > 12) return String(iso);
+        return aprox ? 'hacia ' + MESES[m-1] + ' de ' + a
+                     : d + ' de ' + MESES[m-1] + ' de ' + a;
+    }
 
-        /* '2026-09-18' -> '18 de septiembre de 2026'. Se parte la cadena a mano:
-           new Date('2026-09-18') la interpreta en UTC y en CDMX adelanta un dia.
-           Con aprox = true la fecha es una estimacion, no un registro: se
-           muestra al mes ('hacia agosto de 2026') para no fingir precision
-           que no existe. El orden sigue usando la fecha completa. */
-        function fechaLarga(iso, aprox){
-            if(!iso) return '';
-            const [a, m, d] = String(iso).split('-').map(Number);
-            if(!a || !m || !d || m < 1 || m > 12) return String(iso);
-            return aprox ? 'hacia ' + MESES[m - 1] + ' de ' + a
-                         : d + ' de ' + MESES[m - 1] + ' de ' + a;
-        }
+    /* ===== ICONOGRAFÍA ====================================================
+       Trazo fino, dibujada aquí. Sin emojis y sin archivos externos. */
 
-        function campo(icon, titulo, texto, clases){
-            if(!texto) return '';
-            return `<div class="campo ${clases || ''}">
-                ${icono(icon)}
-                <div><h3>${titulo}</h3><p>${esc(texto)}</p></div>
-            </div>`;
-        }
+    const ICONOS = {
+        agua:        '<path d="M12 3.4c3.2 3.8 5 6.4 5 8.7a5 5 0 0 1-10 0c0-2.3 1.8-4.9 5-8.7Z"/><path d="M9.6 12.6h4.8"/>',
+        sustrato:    '<path d="M3 9c3-1.6 5-1.6 8 0s5 1.6 8 0M3 15c3-1.6 5-1.6 8 0s5 1.6 8 0"/><circle cx="7" cy="5.5" r=".9"/><circle cx="15" cy="19" r=".9"/>',
+        humedad:     '<path d="M12 3.5c3.2 3.8 5 6.4 5 8.7a5 5 0 0 1-10 0c0-2.3 1.8-4.9 5-8.7Z"/>',
+        temperatura: '<path d="M14 13.8V5a2 2 0 1 0-4 0v8.8a4 4 0 1 0 4 0Z"/><path d="M12 9.5v4.6"/>',
+        poda:        '<circle cx="6.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/><path d="M8.3 15.7 18 4M15.7 15.7 6 4"/>',
+        reproduccion:'<path d="M12 20v-7"/><path d="M12 13c0-3 1.8-5 5-5 0 3.2-2 5-5 5Z"/><path d="M12 15c0-2.6-1.6-4.4-4.4-4.4 0 2.8 1.8 4.4 4.4 4.4Z"/>',
+        exigencia:   '<path d="M5 19v-4M12 19V9M19 19V5"/>',
+        problemas:   '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.6v5"/><circle cx="12" cy="16.1" r=".9" fill="currentColor" stroke="none"/>',
+        cuidado:     '<path d="M6.5 3.5h11v17l-5.5-4-5.5 4v-17Z"/>',
+        toxicidad:   '<path d="M12 3.6 21 19.4H3Z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".9" fill="currentColor" stroke="none"/>',
+        calendario:  '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3.5v3M16 3.5v3"/>',
+        procedencia: '<path d="M11.4 3.5H20v8.6l-8.4 8.4a1.7 1.7 0 0 1-2.4 0l-6.2-6.2a1.7 1.7 0 0 1 0-2.4Z"/><circle cx="16" cy="8" r="1.3"/>',
+        rincon:      '<path d="M4 10.4 12 3.8l8 6.6V20.2H4Z"/><path d="M9.4 20.2v-6.1h5.2v6.1"/>',
+        nota:        '<path d="M5 4.5h14v15H5Z"/><path d="M8.4 9h7.2M8.4 12.6h7.2M8.4 16.2h4"/>',
+        chevron:     '<path d="M5 9l7 7 7-7"/>',
+        lupa:        '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l4.5 4.5"/>'
+    };
 
-        function fichaHTML(p){
-            /* Prioridad de la lamina: foto propia > dibujo a mano > marcador.
-               Con foto propia no se pide data-especie, asi el motor de Wikimedia
-               no la sobrescribe. */
-            const lamina = p.foto
-                ? `<img class="plant-photo loaded" src="${esc(p.foto)}" alt="${esc(p.nombre)}" loading="lazy" decoding="async">`
-                : (ilustracion(p.nombre)
-                   || `<span class="sin-lamina">${icono('reproduccion')}</span>`);
-            const acceso = String(p._n).padStart(2, '0');
+    function icono(nombre, tam){
+        return '<svg viewBox="0 0 24 24" width="' + (tam || 19) + '" height="' + (tam || 19) +
+               '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" ' +
+               'aria-hidden="true">' + ICONOS[nombre] + '</svg>';
+    }
 
-            return `<article class="ficha" data-n="${p._n}">
-                <div class="ficha-top">
-                    <a class="marco" href="${urlImagenes(p)}" target="_blank" rel="noopener"
-                       title="Ver fotografías de ${esc(p.nombre)} en Google Imágenes">
-                        <span class="lienzo photo-wrap"${p.foto ? '' : ` data-especie="${esc(p.cientifico)}"`}>${lamina}</span>
-                        <span class="lupa">${icono('lupa')}</span>
-                    </a>
-                    <button class="resumen" type="button" aria-expanded="false">
-                        <span class="linea-sup">
-                            <span>
-                                <span class="nombre">${esc(p.nombre)}</span>
-                                <span class="binomio">${esc(p.cientifico)}</span>
-                            </span>
-                            <span class="acceso">N.º ${acceso}</span>
-                        </span>
-                        <span class="sitio">${esc(p.ubicacion)}${
-                            p._toxica ? '<span class="sello">Tóxica</span>' : ''}</span>
-                        <span class="etiqueta">
-                            <span><span class="dt">Riego</span><span class="dd">${esc(p.riego)}</span></span>
-                            <span><span class="dt">Luz</span><span class="dd">${esc(p.luz)}</span></span>
-                            <span><span class="dt">Manejo</span><span class="dd">${esc(p.dificultad)}</span></span>
-                        </span>
-                        ${icono('chevron', 'chevron')}
-                    </button>
-                </div>
-                <div class="detalle"><div class="interior">
-                    <div class="campos">
-                        ${campo('rincon','Dónde está en casa',p.rincon,'ancho')}
-                        ${campo('sustrato','Sustrato',p.sustrato,'ancho')}
-                        ${campo('humedad','Humedad',p.humedad)}
-                        ${campo('temperatura','Temperatura',p.temperatura)}
-                        ${campo('poda','Poda',p.poda,'ancho')}
-                        ${campo('reproduccion','Reproducción',p.reproduccion,'ancho')}
-                        ${campo('exigencia','Nivel de exigencia',p.nivelExigencia,'ancho')}
-                        ${campo('problemas','Problemas comunes',p.problemas,'ancho aviso')}
-                        ${campo('cuidado','Cuidado especial',p.especial,'ancho')}
-                        ${campo('calendario','En casa desde',fechaLarga(p.fechaIngreso, p.aprox))}
-                        ${campo('procedencia','Llegó de',p.procedencia)}
-                        ${campo('llegada','Cómo llegó',p.alLlegar,'ancho')}
-                    </div>
-                </div></div>
-            </article>`;
-        }
+    /* ===== LÁMINAS VECTORIALES ============================================
+       Heredadas del sistema anterior sin retocarlas. No dependen de
+       internet: si la fotografía no llega, la lámina se queda. */
 
-        function seccionHTML(titulo, descripcion, lista){
-            const n = lista.length;
-            return `<section>
-                <div class="seccion">
-                    <div>
-                        <h2>${esc(titulo)}</h2>
-                        ${descripcion ? `<div class="desc">${esc(descripcion)}</div>` : ''}
-                    </div>
-                    <div class="conteo">${n} ${n === 1 ? 'ejemplar' : 'ejemplares'}</div>
-                </div>
-                ${lista.map(fichaHTML).join('')}
-            </section>`;
-        }
+    const FONDO = '#F4F1E4';
 
-
-        /* ===== ESTADO Y PINTADO ===================================== */
-
-        const nav   = document.getElementById('nav');
-        const hoja  = document.getElementById('hoja');
-        const busca = document.getElementById('q');
-
-        let zonaActiva = ZONAS[0];
-
-        /* ===== ORDEN DE LA COLECCIÓN ===============================
-           Ordena por fecha de ingreso. Cuando varias plantas comparten
-           fecha, el número de acceso decide el desempate y sigue la misma
-           dirección, de modo que "reciente → antigua" sea el reverso
-           exacto de "antigua → reciente" y no un orden distinto. */
-
-        let ordenDir = 'asc';
-        try{
-            const guardado = localStorage.getItem('mi-jardin:orden');
-            if(guardado === 'asc' || guardado === 'desc') ordenDir = guardado;
-        }catch(err){ /* almacenamiento bloqueado: se usa el orden por defecto */ }
-
-        function ordenar(lista){
-            const f = ordenDir === 'asc' ? 1 : -1;
-            return lista.slice().sort((a, b) => {
-                const d = (a._fecha || '').localeCompare(b._fecha || '');
-                return (d !== 0 ? d : a._n - b._n) * f;
-            });
-        }
-
-        const ordenBtns = [...document.querySelectorAll('#orden button')];
-
-        function marcarOrden(){
-            ordenBtns.forEach(b =>
-                b.setAttribute('aria-pressed', b.dataset.dir === ordenDir));
-        }
-
-        ordenBtns.forEach(b => {
-            b.onclick = () => {
-                ordenDir = b.dataset.dir;
-                try{ localStorage.setItem('mi-jardin:orden', ordenDir); }catch(err){}
-                marcarOrden();
-                pintar();
-            };
-        });
-        marcarOrden();
-
-        ZONAS.forEach(clave => {
-            const b = document.createElement('button');
-            b.type = 'button';
-            b.textContent = plantas[clave].corto;
-            b.setAttribute('role', 'tab');
-            b.dataset.zona = clave;
-            b.onclick = () => { busca.value = ''; zonaActiva = clave; pintar(); };
-            nav.appendChild(b);
-        });
-
-        /* "Recientes" no es una zona: es la colección entera vista en orden
-           cronológico. Va junto a las zonas y obedece al mismo control de
-           Orden, así que sirve igual para ver lo último que llegó o para
-           recorrer la colección desde el principio. */
-        const RECIENTES = 'recientes';
-        const btnRecientes = document.createElement('button');
-        btnRecientes.type = 'button';
-        btnRecientes.textContent = 'Recientes';
-        btnRecientes.setAttribute('role', 'tab');
-        btnRecientes.dataset.zona = RECIENTES;
-        btnRecientes.onclick = () => { busca.value = ''; zonaActiva = RECIENTES; pintar(); };
-        nav.appendChild(btnRecientes);
-
-        function pintar(){
-            const q = busca.value.trim().toLowerCase();
-
-            nav.querySelectorAll('button').forEach(b =>
-                b.setAttribute('aria-selected', !q && b.dataset.zona === zonaActiva));
-
-            if(q){
-                const hits = TODAS.filter(p => p._busca.includes(q));
-                hoja.innerHTML = hits.length
-                    ? seccionHTML('Resultados', `Coincidencias con “${q}”`, ordenar(hits))
-                    : `<p class="vacio">Ninguna de las ${TODAS.length} plantas coincide con “${esc(q)}”.</p>`;
-            }else if(zonaActiva === RECIENTES){
-                hoja.innerHTML = seccionHTML('Recientes',
-                    `Las ${TODAS.length} plantas por fecha de ingreso`, ordenar(TODAS));
-            }else{
-                const z = plantas[zonaActiva];
-                hoja.innerHTML = seccionHTML(z.corto, z.descripcion, ordenar(z.plantas));
-            }
-
-            hoja.querySelectorAll('.resumen').forEach(btn => {
-                btn.onclick = () => {
-                    const ficha = btn.closest('.ficha');
-                    const abierta = ficha.classList.toggle('abierta');
-                    btn.setAttribute('aria-expanded', abierta);
-                };
-            });
-
-            cargarFotos();
-        }
-
-        let tecleo;
-        busca.addEventListener('input', () => {
-            clearTimeout(tecleo);
-            tecleo = setTimeout(pintar, 120);
-        });
-
-
-        /* ===== LÁMINAS VECTORIALES =====
-           Dibujadas dentro del archivo. No dependen de internet ni de URLs. */
-
-        const ESPECIE = {
-            "Hoja de Hombre":                    {f:'corazon',    a:'#3f8f4a', b:'#5cb069', c:'#27632f'},
-            "Anturio":                           {f:'anturio',    a:'#2f7a3c', b:'#d92b4b', c:'#f2c14e'},
-            "Diefembaquia Reflectante":          {f:'moteada',    a:'#3d7d3f', b:'#cfe3a8', c:'#2a5a2c'},
-            "Poto Marble Queen":                 {f:'corazon',    a:'#4e9455', b:'#eef3e4', c:'#2f6636', v:'marmol'},
-            "Poto Neón":                         {f:'corazon',    a:'#a8cf3f', b:'#c9e460', c:'#7fa62c'},
-            "Potos Verde":                       {f:'corazon',    a:'#42904c', b:'#63b06d', c:'#2a6633'},
-            "Begonia Ala de Ángel":              {f:'begonia',    a:'#2e6b3a', b:'#e8eef0', c:'#9c2f45'},
-            "Philodendron Burle Marx":           {f:'flecha',     a:'#3c8747', b:'#59a562', c:'#255c2d', esbelta:1},
-            "Monstera Deliciosa":                {f:'monstera',   a:'#357f42', b:'#4d9a59', c:'#22592c'},
-            "Areca":                             {f:'palma',      a:'#57a355', b:'#78bd73', c:'#3d7c3c'},
-            "Árbol del Caucho":                  {f:'ovalada',    a:'#2f5d3a', b:'#436f4a', c:'#8f3b46'},
-            "Sansevieria":                       {f:'espada',     a:'#3f7a45', b:'#d3b45c', c:'#2b5a30'},
-            "Cuerno de Alce":                    {f:'cuerno',     a:'#5c9455', b:'#7fae74', c:'#a8935e'},
-            "Planta del Corazón":                {f:'hoya',       a:'#4a9450', b:'#68b06c', c:'#2f6636'},
-            "Nopalillo Mal Ojo":                 {f:'colgante',   a:'#4d9152', b:'#6cae6f', c:'#356b39'},
-            "Cactus Colgante":                   {f:'colgante',   a:'#2f6b3a', b:'#4a8a52', c:'#1f4d28'},
-            "Palma de Madagascar":               {f:'pachypodium',a:'#8a9186', b:'#4f8f4a', c:'#6b7268'},
-            "Cotyledon Pendens":                 {f:'suculenta',  a:'#6f9c7a', b:'#93b79b', c:'#c96b8e'},
-            "Zebrina":                           {f:'rayada',     a:'#6b4a8c', b:'#c9c3d6', c:'#8f5fa8'},
-            "Peperomia":                         {f:'ovalada',    a:'#48925a', b:'#66ab74', c:'#2f6b3d'},
-            "Meloncito de Jardín":               {f:'sandia',     a:'#2f6b45', b:'#cfd9c4', c:'#8c3f4a'},
-            "Planta China del Dinero":           {f:'moneda',     a:'#4f9c58', b:'#6fb877', c:'#3a7a42'},
-            "Alocasia Frydek":                   {f:'flecha',     a:'#1f4d2c', b:'#8fc79a', c:'#143a1f'},
-            "Alocasia Macrorrhizos 'Variegata'": {f:'flecha',     a:'#3f8a4a', b:'#eaf2e2', c:'#2a6633', v:'marmol'},
-            "Alocasia Longiloba":                {f:'longiloba',  a:'#22502f', b:'#c5d4c2', c:'#16331d'},
-            "Singonio Batik":                    {f:'singonio',   a:'#8dbd71', b:'#2d5c33', c:'#3f7a45'}
-        };
-
-        const FONDO = '#F4F1E4';   // papel de la lámina; constante en ambos temas
                                    // (las caladuras de la monstera se recortan con este mismo tono)
 
         function _venas(c){
@@ -1655,18 +907,217 @@ a{ color: inherit; }
             longiloba:dibujoLongiloba, singonio:dibujoSingonio
         };
 
-        function ilustracion(nombre){
-            const e = ESPECIE[nombre];
-            if(!e) return '';
-            const fn = DIBUJOS[e.f];
-            if(!fn) return '';
-            return `<svg viewBox="0 0 84 84" class="plant-svg" role="img" aria-label="${nombre}">
-                <rect width="84" height="84" rx="2" fill="${FONDO}"/>
-                ${fn(e)}
-            </svg>`;
+    function ilustracion(es){
+        const e = es.svg;
+        if(!e) return '';
+        const f = DIBUJOS[e.f];
+        if(!f) return '';
+        return '<svg class="dibujo" viewBox="0 0 84 84" aria-hidden="true">' +
+               '<rect width="84" height="84" fill="' + FONDO + '"/>' + f(e) + '</svg>';
+    }
+
+    /* ===== PINTADO ======================================================== */
+
+    function campo(ic, rotulo, texto, aviso){
+        if(!texto) return '';
+        return '<div class="campo' + (aviso ? ' campo-aviso' : '') + '">' + icono(ic) +
+               '<div class="texto"><dt>' + esc(rotulo) + '</dt><dd>' + esc(texto) + '</dd></div></div>';
+    }
+
+    function campoExigencia(es){
+        let tramos = '';
+        for(let i = 1; i <= 10; i++) tramos += '<i class="' + (i <= es.exigencia ? 'lleno' : '') + '"></i>';
+        return '<div class="campo">' + icono('exigencia') +
+               '<div class="texto"><dt>Nivel de exigencia</dt>' +
+               '<dd>' + esc(es.exigenciaNota) + '</dd>' +
+               '<div class="exigencia"><span class="tramos" role="img" aria-label="' +
+               es.exigencia + ' de 10">' + tramos + '</span>' +
+               '<span class="cifra">' + es.exigencia + '/10</span></div></div></div>';
+    }
+
+    function campoToxicidad(es){
+        const t = TOXICIDAD[es.toxicidad];
+        let d;
+        if(es.toxicidad === 'sin-dato'){
+            d = 'No figura en la base de la ASPCA. ' + es.toxNota;
+        }else{
+            d = 'La ASPCA clasifica ' + es.toxBinomio + ' como ' +
+                (es.toxicidad === 'toxica' ? 'tóxica' : 'no tóxica') +
+                ' para perros y gatos' + (es.toxPrincipio ? ' (' + es.toxPrincipio + ')' : '') + '.' +
+                (es.toxNota ? ' ' + es.toxNota : '');
+        }
+        return '<div class="campo' + (es.toxicidad === 'toxica' ? ' campo-aviso' : '') + '">' +
+               icono('toxicidad') + '<div class="texto"><dt>Toxicidad</dt>' +
+               '<dd>' + esc(d) + '</dd></div></div>';
+    }
+
+    function urlImagenes(es){
+        return 'https://www.google.com/search?tbm=isch&q=' +
+               encodeURIComponent(es.cientifico + ' ' + es.nombre + ' planta');
+    }
+
+    function fichaHTML(p){
+        const es = p.es;
+        const t = TOXICIDAD[es.toxicidad];
+        const lamina = p.foto
+            ? '<img class="puesta" src="' + esc(p.foto) + '" alt="' + esc(es.nombre) + '" loading="lazy" decoding="async">'
+            : ilustracion(es);
+
+        return '<article class="ficha" data-n="' + p.n + '">' +
+          '<div class="ficha-alto">' +
+            '<a class="lamina' + (p.foto ? '' : ' fotografiable') + '"' +
+               (p.foto ? '' : ' data-especie="' + esc(es.cientifico) + '"') +
+               ' href="' + urlImagenes(es) + '" target="_blank" rel="noopener"' +
+               ' aria-label="Ver fotografías de ' + esc(es.nombre) + ' en Google Imágenes">' +
+               lamina + '<span class="lupa">' + icono('lupa', 13) + '</span></a>' +
+            '<div class="identidad">' +
+              '<span class="acceso">N.º ' + String(p.n).padStart(2, '0') + '</span>' +
+              '<h3>' + esc(es.nombre) + '</h3>' +
+              '<span class="binomio">' + esc(es.cientifico) + '</span>' +
+              (p.rincon ? '<span class="rincon">' + esc(p.rincon) + '</span>' : '') +
+              '<span class="marca ' + t.clase + '">' + t.etiqueta + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<dl class="vistazo">' +
+            '<div><dt>Riego</dt><dd>' + esc(es.riego) + '</dd></div>' +
+            '<div><dt>Luz</dt><dd>' + esc(es.luzDetalle) + '</dd></div>' +
+            '<div><dt>Manejo</dt><dd>' + esc(MANEJO[es.manejo]) + '</dd></div>' +
+          '</dl>' +
+          '<button class="abrir" type="button" aria-expanded="false">' +
+            '<span>Ver la ficha</span>' + icono('chevron', 15) +
+          '</button>' +
+          '<dl class="cuerpo">' +
+            campo('agua', 'Cuánta agua', es.agua) +
+            campo('sustrato', 'Sustrato', es.sustrato) +
+            campo('humedad', 'Humedad', es.humedad) +
+            campo('temperatura', 'Temperatura', es.temperatura) +
+            campo('poda', 'Poda', es.poda) +
+            campo('reproduccion', 'Reproducción', es.reproduccion) +
+            campoExigencia(es) +
+            campo('problemas', 'Problemas comunes', es.problemas, true) +
+            campo('cuidado', 'Cuidado especial', es.especial) +
+            campoToxicidad(es) +
+            campo('calendario', 'En casa desde', fechaLarga(p.fechaIngreso, p.aprox)) +
+            campo('procedencia', 'Llegó de', p.procedencia) +
+            campo('rincon', 'Dónde está en casa', p.rincon) +
+            campo('nota', 'Notas', p.notas) +
+          '</dl>' +
+        '</article>';
+    }
+
+    function seccionHTML(titulo, glosa, lista){
+        return '<div class="encabezado"><h2>' + esc(titulo) + '</h2>' +
+               '<span class="cuenta">' + lista.length +
+               (lista.length === 1 ? ' ejemplar' : ' ejemplares') + '</span>' +
+               (glosa ? '<p class="glosa">' + esc(glosa) + '</p>' : '') + '</div>' +
+               lista.map(fichaHTML).join('');
+    }
+
+    /* ===== ESTADO ========================================================= */
+
+    const navega = document.getElementById('navega');
+    const hoja   = document.getElementById('hoja');
+    const busca  = document.getElementById('q');
+    const aviso  = document.getElementById('aviso');
+
+    let grupoActivo = LUZ[0].clave;
+    let ordenDir = 'asc';
+    try{
+        const g = localStorage.getItem('mi-jardin:orden');
+        if(g === 'asc' || g === 'desc') ordenDir = g;
+    }catch(err){ /* almacenamiento bloqueado: se usa el orden por omisión */ }
+
+    /* Cuando varios ejemplares comparten fecha, el número de acceso desempata
+       y sigue la misma dirección, de modo que un orden sea el reverso exacto
+       del otro y no un orden distinto. */
+    function ordenar(lista){
+        const f = ordenDir === 'asc' ? 1 : -1;
+        return lista.slice().sort(function(a, b){
+            const d = String(a.fechaIngreso || '').localeCompare(String(b.fechaIngreso || ''));
+            return (d !== 0 ? d : a.n - b.n) * f;
+        });
+    }
+
+    LUZ.forEach(function(g){
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'pestana';
+        b.textContent = g.corto;
+        b.setAttribute('role', 'tab');
+        b.dataset.grupo = g.clave;
+        b.onclick = function(){ busca.value = ''; grupoActivo = g.clave; pintar(); };
+        navega.appendChild(b);
+    });
+
+    const btnRecientes = document.createElement('button');
+    btnRecientes.type = 'button';
+    btnRecientes.className = 'pestana';
+    btnRecientes.textContent = 'Recientes';
+    btnRecientes.setAttribute('role', 'tab');
+    btnRecientes.dataset.grupo = RECIENTES;
+    btnRecientes.onclick = function(){ busca.value = ''; grupoActivo = RECIENTES; pintar(); };
+    navega.appendChild(btnRecientes);
+
+    const botonesOrden = Array.prototype.slice.call(document.querySelectorAll('#orden button'));
+    function marcarOrden(){
+        botonesOrden.forEach(function(b){
+            b.setAttribute('aria-pressed', String(b.dataset.dir === ordenDir));
+        });
+    }
+    botonesOrden.forEach(function(b){
+        b.onclick = function(){
+            ordenDir = b.dataset.dir;
+            try{ localStorage.setItem('mi-jardin:orden', ordenDir); }catch(err){}
+            marcarOrden();
+            pintar();
+        };
+    });
+    marcarOrden();
+
+    function pintar(){
+        const q = busca.value.trim().toLowerCase();
+
+        navega.querySelectorAll('.pestana').forEach(function(b){
+            b.setAttribute('aria-selected', String(!q && b.dataset.grupo === grupoActivo));
+        });
+
+        if(q){
+            const hits = ordenar(TODOS.filter(function(p){ return p._busca.indexOf(q) !== -1; }));
+            hoja.innerHTML = hits.length
+                ? seccionHTML('Resultados', 'Coincidencias con “' + q + '”', hits)
+                : '<p class="vacio">Ninguno de los ' + TODOS.length +
+                  ' ejemplares coincide con “' + esc(q) + '”.</p>';
+            aviso.textContent = hits.length + ' resultados para ' + q;
+        }else if(grupoActivo === RECIENTES){
+            hoja.innerHTML = seccionHTML('Recientes',
+                'Los ' + TODOS.length + ' ejemplares por fecha de llegada a casa.', ordenar(TODOS));
+            aviso.textContent = 'Recientes, ' + TODOS.length + ' ejemplares';
+        }else{
+            const g = LUZ.filter(function(x){ return x.clave === grupoActivo; })[0];
+            const lista = ordenar(TODOS.filter(function(p){ return p.es.luz === grupoActivo; }));
+            hoja.innerHTML = seccionHTML(g.titulo, g.glosa, lista);
+            aviso.textContent = g.titulo + ', ' + lista.length + ' ejemplares';
         }
 
-        /* ===== FOTOS REALES (capa opcional sobre el dibujo) =====
+        hoja.querySelectorAll('.abrir').forEach(function(btn){
+            btn.onclick = function(){
+                const ficha = btn.closest('.ficha');
+                const abierta = ficha.classList.toggle('abierta');
+                btn.setAttribute('aria-expanded', String(abierta));
+                btn.querySelector('span').textContent = abierta ? 'Cerrar la ficha' : 'Ver la ficha';
+            };
+        });
+
+        cargarFotos();
+    }
+
+    let tecleo;
+    busca.addEventListener('input', function(){
+        clearTimeout(tecleo);
+        tecleo = setTimeout(pintar, 120);
+    });
+
+/* ===== FOTOS REALES (capa opcional sobre el dibujo) =====
            Motor v2: usa la Action API de MediaWiki (/w/api.php), que SÍ respeta
            origin=* y devuelve cabeceras CORS. (El endpoint REST
            /api/rest_v1/page/summary ignora origin=* y falla desde el navegador.)
@@ -1798,41 +1249,45 @@ a{ color: inherit; }
             return cacheFotos[cientifico];
         }
 
-        function cargarFotos(){
-            document.querySelectorAll('.photo-wrap[data-especie]').forEach(async wrap => {
-                if(wrap.dataset.listo) return;
-                wrap.dataset.listo = '1';
-                let src = null;
-                try{ src = await buscarFoto(wrap.dataset.especie); }catch(err){ return; }
+        
+
+    /* Pide la fotografía de cada lámina visible que no tenga foto propia.
+       Si no llega, la lámina dibujada se queda: nunca hay hueco. */
+    function cargarFotos(){
+        hoja.querySelectorAll('.lamina.fotografiable[data-especie]').forEach(function(marco){
+            if(marco.dataset.pedida) return;
+            marco.dataset.pedida = '1';
+            buscarFoto(marco.dataset.especie).then(function(src){
                 if(!src) return;
-                const img = document.createElement('img');
-                img.className = 'plant-photo';
-                img.alt = wrap.dataset.especie;
+                const img = new Image();
+                img.alt = '';
                 img.loading = 'lazy';
                 img.decoding = 'async';
                 img.referrerPolicy = 'no-referrer';
-                img.onload = () => img.classList.add('loaded');
-                img.onerror = () => img.remove();
+                img.onload = function(){ img.classList.add('puesta'); };
+                img.onerror = function(){ img.remove(); };
                 img.src = src;
-                wrap.appendChild(img);
-            });
-        }
+                marco.appendChild(img);
+            }).catch(function(){ /* sin fotografía: se queda la lámina */ });
+        });
+    }
 
-        /* Diagnóstico manual: abrir la consola del navegador (F12) y escribir
-           diagFotos()  -> tabla con la foto encontrada para cada especie. */
-        async function diagFotos(){
-            const filas = [];
-            for(const p of TODAS){
-                let url = null, error = '';
-                try{ url = await buscarFoto(p.cientifico); }catch(err){ error = err.message; }
-                filas.push({ n: p._n, especie: p.cientifico, foto: url ? 'OK' : 'sin foto', url: url || error });
-            }
-            console.table(filas);
-            return filas;
+    /* Diagnóstico manual: abre la consola del navegador y escribe diagFotos().
+       Devuelve una tabla de qué especie encontró fotografía y cuál no. */
+    async function diagFotos(){
+        const filas = [];
+        for(const p of TODOS){
+            let url = null, error = '';
+            try{ url = await buscarFoto(p.es.cientifico); }catch(err){ error = err.message; }
+            filas.push({ n: p.n, especie: p.es.cientifico, foto: url ? 'OK' : 'sin foto', url: url || error });
         }
-        window.diagFotos = diagFotos;
+        console.table(filas);
+        return filas;
+    }
+    window.diagFotos = diagFotos;
 
-        pintar();
-    </script>
+    pintar();
+})();
+</script>
 </body>
 </html>
