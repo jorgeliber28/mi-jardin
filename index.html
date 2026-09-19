@@ -780,7 +780,8 @@ a{ color: inherit; }
                     {
                         nombre: "Singonio Batik",
                         cientifico: "Syngonium podophyllum 'Batik'",
-                        fechaIngreso: "2026-09-19",
+                        fechaIngreso: "2026-09-12",
+                        procedencia: "Mercado de plantas El Pípila",
                         ubicacion: "Ventana N/E con cortina, o repisa a 1 m de la ventana",
                         riego: "5-7 días",
                         luz: "Media (brillante indirecta si puedes)",
@@ -840,7 +841,8 @@ a{ color: inherit; }
                     {
                         nombre: "Alocasia Longiloba",
                         cientifico: "Alocasia longiloba",
-                        fechaIngreso: "2026-09-19",
+                        fechaIngreso: "2026-09-12",
+                        procedencia: "Mercado de plantas El Pípila",
                         ubicacion: "Ventana este, a 50-80 cm del vidrio. Nunca sol directo de mediodía.",
                         riego: "7-10 días",
                         luz: "Brillante indirecta (NO directa)",
@@ -1147,8 +1149,9 @@ a{ color: inherit; }
                 p._fecha = p.fechaIngreso || '';
                 const txt = (p.especial || '') + ' ' + (p.problemas || '');
                 p._toxica = /t[óo]xic/i.test(txt) && !/no\s+t[óo]xic/i.test(txt);
-                p._busca = [p.nombre, p.cientifico, p.ubicacion, p.luz, p.dificultad]
-                           .join(' ').toLowerCase();
+                p._busca = [p.nombre, p.cientifico, p.ubicacion, p.luz, p.dificultad,
+                            p.rincon, p.procedencia]
+                           .filter(Boolean).join(' ').toLowerCase();
                 TODAS.push(p);
             });
         });
