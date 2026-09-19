@@ -208,6 +208,47 @@ a{ color: inherit; }
 .buscador input:focus{ outline: none; }
 .buscador:focus-within{ border-bottom-color: var(--verde); }
 
+/* ---------- Orden de la colección --------------------------------------- */
+
+.orden{
+    max-width: var(--ancho);
+    margin: 0 auto;
+    padding: 13px 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.orden .rotulo{
+    font-family: var(--mecano);
+    font-size: .64rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--tinta-3);
+    flex-shrink: 0;
+}
+.orden .grupo{ display: flex; gap: 6px; }
+.orden button{
+    appearance: none;
+    background: none;
+    border: 1px solid var(--linea);
+    border-radius: 2px;
+    padding: 5px 10px;
+    margin: 0;
+    cursor: pointer;
+    color: var(--tinta-2);
+    font-family: var(--mecano);
+    font-size: .63rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    transition: color .18s ease, border-color .18s ease;
+}
+.orden button:hover{ color: var(--tinta); border-color: var(--tinta-3); }
+.orden button[aria-pressed="true"]{
+    color: var(--verde);
+    border-color: var(--verde);
+}
+
 /* ---------- Encabezado de sección --------------------------------------- */
 
 .hoja{
@@ -544,6 +585,14 @@ a{ color: inherit; }
     <input id="q" type="search" autocomplete="off" placeholder="nombre, especie o rincón…">
 </div>
 
+<div class="orden" id="orden">
+    <span class="rotulo">Orden</span>
+    <div class="grupo" role="group" aria-label="Orden de la colección">
+        <button type="button" data-dir="asc"  aria-pressed="true">Antigua → reciente</button>
+        <button type="button" data-dir="desc" aria-pressed="false">Reciente → antigua</button>
+    </div>
+</div>
+
 <main class="hoja" id="hoja"></main>
 
 <footer class="pie">
@@ -562,6 +611,7 @@ a{ color: inherit; }
                     {
                         nombre: "Hoja de Hombre",
                         cientifico: "Philodendron hederaceum",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Rincón, pasillo",
                         riego: "5-7 días",
                         luz: "Baja",
@@ -578,6 +628,7 @@ a{ color: inherit; }
                     {
                         nombre: "Anturio",
                         cientifico: "Anthurium andraeanum",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Rincón, interior",
                         riego: "5-7 días",
                         luz: "Baja-Media",
@@ -594,6 +645,7 @@ a{ color: inherit; }
                     {
                         nombre: "Diefembaquia Reflectante",
                         cientifico: "Dieffenbachia 'Reflector'",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Rincón, interior",
                         riego: "5-7 días",
                         luz: "Baja-Media",
@@ -617,6 +669,7 @@ a{ color: inherit; }
                     {
                         nombre: "Poto Marble Queen",
                         cientifico: "Epipremnum aureum 'Marble Queen'",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Ventana N/E con cortina",
                         riego: "5-7 días",
                         luz: "Media",
@@ -633,6 +686,7 @@ a{ color: inherit; }
                     {
                         nombre: "Poto Neón",
                         cientifico: "Epipremnum aureum 'Neon'",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Ventana con luz media-brillante",
                         riego: "5-7 días",
                         luz: "Media-Brillante",
@@ -649,6 +703,7 @@ a{ color: inherit; }
                     {
                         nombre: "Potos Verde",
                         cientifico: "Epipremnum aureum",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Cualquier lugar interior",
                         riego: "5-7 días",
                         luz: "Baja-Media",
@@ -665,6 +720,7 @@ a{ color: inherit; }
                     {
                         nombre: "Begonia Ala de Ángel",
                         cientifico: "Begonia maculata",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Ventana N/E, luz media",
                         riego: "5-7 días",
                         luz: "Media",
@@ -681,6 +737,7 @@ a{ color: inherit; }
                     {
                         nombre: "Philodendron Burle Marx",
                         cientifico: "Philodendron 'Burle Marx'",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Escritorio, mesa con luz media",
                         riego: "5-7 días",
                         luz: "Media",
@@ -697,6 +754,7 @@ a{ color: inherit; }
                     {
                         nombre: "Monstera Deliciosa",
                         cientifico: "Monstera deliciosa",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Ventana con luz media-brillante",
                         riego: "7-10 días",
                         luz: "Media-Brillante",
@@ -720,6 +778,7 @@ a{ color: inherit; }
                     {
                         nombre: "Areca",
                         cientifico: "Dypsis lutescens",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Ventana este brillante",
                         riego: "7-10 días",
                         luz: "Media-Alta",
@@ -736,6 +795,7 @@ a{ color: inherit; }
                     {
                         nombre: "Árbol del Caucho",
                         cientifico: "Ficus elastica",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Ventana con buena luz",
                         riego: "7-10 días",
                         luz: "Media-Alta (ama luz)",
@@ -759,6 +819,7 @@ a{ color: inherit; }
                     {
                         nombre: "Sansevieria",
                         cientifico: "Sansevieria trifasciata",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Rincón, sin luz directa",
                         riego: "10-14 días",
                         luz: "Muy Baja (tolera oscuridad)",
@@ -775,6 +836,7 @@ a{ color: inherit; }
                     {
                         nombre: "Cuerno de Alce",
                         cientifico: "Platycerium bifurcatum",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Pared en tabla de corcho",
                         riego: "10-14 días (rocía)",
                         luz: "Media (no sol directo)",
@@ -791,6 +853,7 @@ a{ color: inherit; }
                     {
                         nombre: "Planta del Corazón",
                         cientifico: "Hoya kerrii",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Escritorio, estante",
                         riego: "10-14 días",
                         luz: "Baja-Media",
@@ -807,6 +870,7 @@ a{ color: inherit; }
                     {
                         nombre: "Nopalillo Mal Ojo",
                         cientifico: "Rhipsalis baccifera",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Colgante en ventana",
                         riego: "10-14 días (rocía)",
                         luz: "Media (tolera sombra)",
@@ -823,6 +887,7 @@ a{ color: inherit; }
                     {
                         nombre: "Cactus Colgante",
                         cientifico: "Rhipsalis baccifera subsp. horrida",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Cesto colgante",
                         riego: "10-14 días",
                         luz: "Media-Baja",
@@ -846,6 +911,7 @@ a{ color: inherit; }
                     {
                         nombre: "Palma de Madagascar",
                         cientifico: "Pachypodium lamerei",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Ventana sur/oeste",
                         riego: "10-14 días",
                         luz: "SOL DIRECTO",
@@ -862,6 +928,7 @@ a{ color: inherit; }
                     {
                         nombre: "Cotyledon Pendens",
                         cientifico: "Cotyledon pendens",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Canasta colgante",
                         riego: "10-14 días",
                         luz: "SOL DIRECTO",
@@ -878,6 +945,7 @@ a{ color: inherit; }
                     {
                         nombre: "Zebrina",
                         cientifico: "Tradescantia zebrina",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Ventana sur/oeste",
                         riego: "7-10 días",
                         luz: "Luz Brillante (sol suave)",
@@ -894,6 +962,7 @@ a{ color: inherit; }
                     {
                         nombre: "Peperomia",
                         cientifico: "Peperomia obtusifolia",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Mesa, escritorio con luz",
                         riego: "10-14 días",
                         luz: "Media-Brillante",
@@ -910,6 +979,7 @@ a{ color: inherit; }
                     {
                         nombre: "Meloncito de Jardín",
                         cientifico: "Peperomia argyreia",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Ventana con luz brillante",
                         riego: "10-14 días",
                         luz: "Brillante",
@@ -926,6 +996,7 @@ a{ color: inherit; }
                     {
                         nombre: "Planta China del Dinero",
                         cientifico: "Pilea peperomioides",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Ventana con luz brillante",
                         riego: "7-10 días",
                         luz: "Brillante (no directo)",
@@ -942,6 +1013,7 @@ a{ color: inherit; }
                     {
                         nombre: "Alocasia Frydek",
                         cientifico: "Alocasia micholitziana 'Frydek'",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Ventana este brillante",
                         riego: "7-10 días",
                         luz: "Brillante (NO directo)",
@@ -958,6 +1030,7 @@ a{ color: inherit; }
                     {
                         nombre: "Alocasia Macrorrhizos 'Variegata'",
                         cientifico: "Alocasia macrorrhizos 'Variegata'",
+                        fechaIngreso: "2026-09-18",
                         ubicacion: "Ventana con buena luz",
                         riego: "7-10 días",
                         luz: "Brillante (indirecta)",
@@ -989,7 +1062,8 @@ a{ color: inherit; }
             problemas: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.6v5"/><circle cx="12" cy="16.1" r=".9" fill="currentColor" stroke="none"/>',
             cuidado:  '<path d="M6.5 3.5h11v17l-5.5-4-5.5 4v-17Z"/>',
             lupa:     '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l4.5 4.5"/>',
-            chevron:  '<path d="M5 9l7 7 7-7"/>'
+            chevron:  '<path d="M5 9l7 7 7-7"/>',
+            calendario: '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3.5v3M16 3.5v3"/>'
         };
 
         function icono(nombre, extra){
@@ -1009,6 +1083,7 @@ a{ color: inherit; }
             plantas[clave].plantas.forEach(p => {
                 p._zona = clave;
                 p._n = TODAS.length + 1;
+                p._fecha = p.fechaIngreso || '';
                 const txt = (p.especial || '') + ' ' + (p.problemas || '');
                 p._toxica = /t[óo]xic/i.test(txt) && !/no\s+t[óo]xic/i.test(txt);
                 p._busca = [p.nombre, p.cientifico, p.ubicacion, p.luz, p.dificultad]
@@ -1027,6 +1102,18 @@ a{ color: inherit; }
             return 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(q);
         }
 
+        const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio',
+                       'agosto','septiembre','octubre','noviembre','diciembre'];
+
+        /* '2026-09-18' -> '18 de septiembre de 2026'. Se parte la cadena a mano:
+           new Date('2026-09-18') la interpreta en UTC y en CDMX adelanta un dia. */
+        function fechaLarga(iso){
+            if(!iso) return '';
+            const [a, m, d] = String(iso).split('-').map(Number);
+            if(!a || !m || !d || m < 1 || m > 12) return String(iso);
+            return d + ' de ' + MESES[m - 1] + ' de ' + a;
+        }
+
         function campo(icon, titulo, texto, clases){
             if(!texto) return '';
             return `<div class="campo ${clases || ''}">
@@ -1036,15 +1123,20 @@ a{ color: inherit; }
         }
 
         function fichaHTML(p){
-            const lamina = ilustracion(p.nombre)
-                || `<span class="sin-lamina">${icono('reproduccion')}</span>`;
+            /* Prioridad de la lamina: foto propia > dibujo a mano > marcador.
+               Con foto propia no se pide data-especie, asi el motor de Wikimedia
+               no la sobrescribe. */
+            const lamina = p.foto
+                ? `<img class="plant-photo loaded" src="${esc(p.foto)}" alt="${esc(p.nombre)}" loading="lazy" decoding="async">`
+                : (ilustracion(p.nombre)
+                   || `<span class="sin-lamina">${icono('reproduccion')}</span>`);
             const acceso = String(p._n).padStart(2, '0');
 
             return `<article class="ficha" data-n="${p._n}">
                 <div class="ficha-top">
                     <a class="marco" href="${urlImagenes(p)}" target="_blank" rel="noopener"
                        title="Ver fotografías de ${esc(p.nombre)} en Google Imágenes">
-                        <span class="lienzo photo-wrap" data-especie="${esc(p.cientifico)}">${lamina}</span>
+                        <span class="lienzo photo-wrap"${p.foto ? '' : ` data-especie="${esc(p.cientifico)}"`}>${lamina}</span>
                         <span class="lupa">${icono('lupa')}</span>
                     </a>
                     <button class="resumen" type="button" aria-expanded="false">
@@ -1075,6 +1167,7 @@ a{ color: inherit; }
                         ${campo('exigencia','Nivel de exigencia',p.nivelExigencia,'ancho')}
                         ${campo('problemas','Problemas comunes',p.problemas,'ancho aviso')}
                         ${campo('cuidado','Cuidado especial',p.especial,'ancho')}
+                        ${campo('calendario','En casa desde',fechaLarga(p.fechaIngreso))}
                     </div>
                 </div></div>
             </article>`;
@@ -1103,6 +1196,43 @@ a{ color: inherit; }
 
         let zonaActiva = ZONAS[0];
 
+        /* ===== ORDEN DE LA COLECCIÓN ===============================
+           Ordena por fecha de ingreso. Cuando varias plantas comparten
+           fecha, el número de acceso decide el desempate y sigue la misma
+           dirección, de modo que "reciente → antigua" sea el reverso
+           exacto de "antigua → reciente" y no un orden distinto. */
+
+        let ordenDir = 'asc';
+        try{
+            const guardado = localStorage.getItem('mi-jardin:orden');
+            if(guardado === 'asc' || guardado === 'desc') ordenDir = guardado;
+        }catch(err){ /* almacenamiento bloqueado: se usa el orden por defecto */ }
+
+        function ordenar(lista){
+            const f = ordenDir === 'asc' ? 1 : -1;
+            return lista.slice().sort((a, b) => {
+                const d = (a._fecha || '').localeCompare(b._fecha || '');
+                return (d !== 0 ? d : a._n - b._n) * f;
+            });
+        }
+
+        const ordenBtns = [...document.querySelectorAll('#orden button')];
+
+        function marcarOrden(){
+            ordenBtns.forEach(b =>
+                b.setAttribute('aria-pressed', b.dataset.dir === ordenDir));
+        }
+
+        ordenBtns.forEach(b => {
+            b.onclick = () => {
+                ordenDir = b.dataset.dir;
+                try{ localStorage.setItem('mi-jardin:orden', ordenDir); }catch(err){}
+                marcarOrden();
+                pintar();
+            };
+        });
+        marcarOrden();
+
         ZONAS.forEach(clave => {
             const b = document.createElement('button');
             b.type = 'button';
@@ -1122,11 +1252,11 @@ a{ color: inherit; }
             if(q){
                 const hits = TODAS.filter(p => p._busca.includes(q));
                 hoja.innerHTML = hits.length
-                    ? seccionHTML('Resultados', `Coincidencias con “${q}”`, hits)
+                    ? seccionHTML('Resultados', `Coincidencias con “${q}”`, ordenar(hits))
                     : `<p class="vacio">Ninguna de las ${TODAS.length} plantas coincide con “${esc(q)}”.</p>`;
             }else{
                 const z = plantas[zonaActiva];
-                hoja.innerHTML = seccionHTML(z.corto, z.descripcion, z.plantas);
+                hoja.innerHTML = seccionHTML(z.corto, z.descripcion, ordenar(z.plantas));
             }
 
             hoja.querySelectorAll('.resumen').forEach(btn => {
